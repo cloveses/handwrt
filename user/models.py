@@ -36,7 +36,7 @@ class CategoryWrite(models.Model):
 
 class CategoryContent(models.Model):
     name = models.CharField(max_length=12, verbose_name='内容类别')
-    parent = models.ForeignKey('self', on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', null=True, on_delete=models.CASCADE)
 
 class KnonWrite(models.Model):
     title = models.CharField(max_length=256, verbose_name='标题')
