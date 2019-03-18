@@ -11,3 +11,15 @@ def helo(request):
 @require_http_methods(['POST',])
 def login(request):
     return JsonResponse({'status':0})
+
+
+def mgr(request):
+    return render(request, 'mgr.html', {})
+
+
+def umgr(request):
+    # page = request.GET.get('page', '0')
+    pass
+
+def register(request):
+

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}网站管理{% endblock %}
+
+{% block top %}欢迎超管！{% endblock %}
+
+{% block side %}
+    <style type="text/css">
+        .pure-menu-link {
+            color: red;
+        }
+    </style>
+    <div class="pure-menu custom-restricted-width">
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link">管理盟</a></li>
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link">管理用户</a></li>
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link">标签设置</a></li>
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link">作品管理</a></li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block main %}
+<iframe id="frame_main" src="" style="width: 100%;min-height:500px;border:0;"></iframe>
+{% endblock %}

@@ -1,1 +1,106 @@
 {% extends 'base.html' %}
+
+{% block scpt %}
+<script type="text/javascript">
+$(function(){
+    createLoginArea();
+    function createLoginArea() {
+
+        var field = $('<fieldset />');
+
+        field.css({
+            position:'absolute',
+            width:'60vmin',
+            height:'40vmin',
+            border: '1px solid #61B5CF'
+        });
+        field.css('border-radius','1vmin');
+
+        var legend = $('<legend />');
+        legend.text("登陆");
+        var ul = $('<ul />');
+        ul.css('list-style','none');
+        ul.css('text-align','center');
+        ul.css({
+            width: '100%',
+            height: '100%',
+            margin: '0',
+            display: 'inline'
+        }).css('padding-top', '5%')
+            .css('box-sizing', 'border-box');
+
+        var nameLi = $('<li />',{class:'loginLi'});
+        var nameDiv=$('<div />',{class:'textDiv'});
+        nameDiv.text("用户名");
+        var nameInput=$('<input />',{class:"input",type:"text",placeholder:"请输入用户名"});
+        nameLi.append(nameDiv);
+        nameLi.append(nameInput);
+        var passwordLi = $('<li />',{class:'loginLi'});
+        var passWordDiv=$('<div />',{class:'textDiv'});
+        passWordDiv.text("密码");
+        var passWordInput=$('<input />',{class:"input",type:"password",placeholder:"请输入密码"});
+        passwordLi.append(passWordDiv);
+        passwordLi.append(passWordInput);
+
+        var submitLi = $('<li />',{class:'loginLi'});
+        var submitBtn = $('<input />', {type: 'submit', value: '登陆'});
+        var stateLi = $('<li />',{class:'loginLi'});
+        submitLi.append(submitBtn);
+        ul.append(nameLi);
+        ul.append(passwordLi);
+        ul.append(submitLi);
+        ul.append(stateLi);
+        legend.appendTo(field);
+        ul.appendTo(field);
+        field.appendTo($('body'));
+
+
+
+        $('.loginLi').css({
+            width: '80%',
+            height: '25%',
+            padding: '0',
+            margin: '0'
+        }).css('text-align', 'left')
+            .css('line-height', '9vmin');
+        stateLi.css('text-align', 'center');
+        submitLi.css('text-align', 'center');
+        $('.input').css({
+            position: 'relative', float: 'left', width: '60%',
+            height: '80%'
+        }).css('margin-left','1%');
+        $('.textDiv').css({
+            position: 'relative', float: 'left', width: '35%',
+            height: '80%'
+        }).css('text-align', 'right');
+        stateLi.css('height','20%');
+        //设置界面位置
+        var body=$('body');
+        field.css({
+            top:'20vmin',
+            left:parseInt((body.width()-field.width())/2)
+        });
+        var token = $("input[name='csrfmiddlewaretoken']").val();
+        //上传事件
+        submitLi.on('click',function () {
+            $.ajax({
+                type: 'POST',
+                url: '/user/login/',//提交的地址
+                data: {name:nameInput.val(),passWord:passWordInput.val(),csrfmiddlewaretoken:token},
+                dataType: 'json',
+                timeout: 3000,
+                context: $('body'),
+                success: function (data) {
+                    stateLi.text(data);
+                    field.hide();
+                },
+                error: function (xhr, type) {
+                    stateLi.text("上传失败");
+                }
+            })
+        });
+
+    }
+   })
+</script>
+{% endblock %}
