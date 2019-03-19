@@ -14,7 +14,7 @@
         <ul class="pure-menu-list">
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">管理盟</a></li>
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">管理用户</a></li>
-            <li class="pure-menu-item"><a href="#" class="pure-menu-link">标签设置</a></li>
+            <li class="pure-menu-item"><a id="category" href="javascript:void(0);" class="pure-menu-link">标签设置</a></li>
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">作品管理</a></li>
         </ul>
     </div>
@@ -22,4 +22,11 @@
 
 {% block main %}
 <iframe id="frame_main" src="" style="width: 100%;min-height:500px;border:0;"></iframe>
+<script type="text/javascript">
+    $(function(){
+        $('body').on('click','#category',function(){
+            $('#frame_main').attr('src','/user/category_write/');
+        });
+    });
+</script>
 {% endblock %}
