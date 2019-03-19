@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<table>
+    <tr>
+        <td>用户名</td>
+        <td>邮件地址</td>
+        <td>用户类型</td>
+        <td>用户状态</td>
+        <td>执行操作</td>
+    </tr>
+    {% for user in users%}
+        <tr>
+            <td>{{user.name}}</td>
+            <td>{{user.email}}</td>
+            <td>{{user.permission}}</td>
+            <td>{{user.status}}</td>
+            <td>
+                <form action="{{ url 'user_mgr'}}" method="post">
+                    {% csrf_token %}
+                    <select name="operation">
+                        <option value="0">删除</option>
+                        <option value="1">警告</option>
+                        <option value="2">冻结</option>
+                    </select>
+                    <input type="text" name="reason" value="" placeholder="警告理由" />
+                    <input name="id" type="hidden" value="{{user.id}}" />
+                    <input type="submit" value="确定" />
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

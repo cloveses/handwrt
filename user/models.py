@@ -7,6 +7,7 @@ class User(models.Model):
     passwd = models.CharField(max_length=512, verbose_name='密码')
     email = models.EmailField(verbose_name='邮箱地址')
     permission = models.IntegerField(default=2, verbose_name='用户类型')
+    status = models.IntegerField(default=0, verbose_name='用户状态')
 
 class UserInfo(models.Model):
     content = models.TextField()

@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'inbase.html' %}
+
 {% block left %}
     <table>
         <tr>
@@ -25,8 +20,32 @@
         <input type="submit" value="添加"/>
     </form>
 {% endblock %}
+
 {% block right %}
+    <table>
+        <tr>
+            <td>分类名称</td>
+            <td>父级分类</td>
+            <td>操作</td>
+        </tr>
+        {% for data in data_cs %}
+        <tr>
+            <td>{{data.name}}</td>
+            <td>{% if data.parent %} {{data.parent.name}} {%endif%}</td>
+            <td><a href="/user/category_content/del/{{data.id}}/">删除</a> </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <form action="{%url 'category_content_add'%}" method="post">
+        {% csrf_token %}
+        <input type="text" name="name" placeholder="分类名称" />
+        <select name="parent">
+            {% for p in parent_contents %}
+                <option value="{{p.id}}">{{p.name}}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="添加"/>
+    </form>
 
 {% endblock %}
-</body>
-</html>

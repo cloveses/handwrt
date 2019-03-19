@@ -13,7 +13,7 @@
     <div class="pure-menu custom-restricted-width">
         <ul class="pure-menu-list">
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">管理盟</a></li>
-            <li class="pure-menu-item"><a href="#" class="pure-menu-link">管理用户</a></li>
+            <li class="pure-menu-item"><a id="usermgr" href="javascript:void(0);" class="pure-menu-link">管理用户</a></li>
             <li class="pure-menu-item"><a id="category" href="javascript:void(0);" class="pure-menu-link">标签设置</a></li>
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">作品管理</a></li>
         </ul>
@@ -26,6 +26,9 @@
     $(function(){
         $('body').on('click','#category',function(){
             $('#frame_main').attr('src','/user/category_write/');
+        });
+        $('body').on('click','#usermgr',function(){
+            $('#frame_main').attr('src','/user/usermgr/');
         });
     });
 </script>
