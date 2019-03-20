@@ -5,6 +5,7 @@ from .models import CategoryWrite, CategoryContent, User, UserInfo
 from django.core.paginator import Paginator
 from django.urls import reverse
 from django.forms import ModelForm
+import hashlib
 # Create your views here.
 
 def helo(request):
@@ -24,9 +25,33 @@ def user_mgr(request):
     # page = request.GET.get('page', '0')
     pass
 
+class UserModel(ModelForm):
+    class Meta:
+        model = User
+        fields = ['name', 'passwd', 'email']
+
+    def clean_passwd(self):
+        password1 = self.cleaned_data['password1']
+        password2 = self.cleaned_data['password2']
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError('Password do not match!')
+        return self.make_passwd(password1, self.cleaned_data['email'])
+
+    def make_passwd(self, psw, salt):
+        psw = ''.join((psw, salt))
+        psw = psw.encode('utf-8')
+        ret = hashlib.sha512(psw).hexdigest()
+        return ret
+
 
 def register(request):
-    pass
+    if request.method == 'GET':
+        return render(request, 'reg.html', {})
+    else:
+        u = UserModel(request.POST)
+        if u.is_valid():
+            u.save()
+        return HttpResponseRedirect(reverse('helo'))
 
 
 def category_mgr(request):
@@ -74,7 +99,7 @@ def user_mgr(request):
     if request.method == 'GET':
         users = User.objects.all()
         users = Paginator(users, 10).page(1)
-        return render(request, 'usermgr.html', {'users':users})
+        return render(request, 'user_mgr.html', {'users':users})
     elif request.method == 'POST':
         operation = request.POST.get('operation', '')
         uid = request.POST.get('id', '')
@@ -85,5 +110,14 @@ def user_mgr(request):
                 u = User.objects.get(id=int(uid))
                 if u:
                     u.status = 1
+                reason = request.POST.get('reason','')
+                UserInfo(content=reason, user=u).save()
+                u.save()
+            elif operation == 2:
+                u = User.objects.get(id=int(uid))
+                if u:
+                    u.status = 2
+                    u.save()
+        return HttpResponseRedirect(reverse('user_mgr'))
 
 

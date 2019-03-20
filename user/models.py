@@ -1,4 +1,5 @@
 from django.db import models
+import datetime
 
 # Create your models here.
 
@@ -11,6 +12,7 @@ class User(models.Model):
 
 class UserInfo(models.Model):
     content = models.TextField()
+    create_date = models.DateTimeField(default=datetime.datetime.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
 class HandWrite(models.Model):

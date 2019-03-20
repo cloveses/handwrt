@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'inbase_smpl.html' %}
 
 {% block main %}
 <table>
@@ -16,7 +16,7 @@
             <td>{{user.permission}}</td>
             <td>{{user.status}}</td>
             <td>
-                <form action="{{ url 'user_mgr'}}" method="post">
+                <form action="{% url 'user_mgr'%}" method="post">
                     {% csrf_token %}
                     <select name="operation">
                         <option value="0">删除</option>

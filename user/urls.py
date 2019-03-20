@@ -10,5 +10,6 @@ urlpatterns = [
     path(r'category_write/add/', views.category_write_add, name='category_write_add'),
     path(r'category_content/add/', views.category_content_add, name='category_content_add'),
     path(r'user_mgr/', views.user_mgr, name='user_mgr'),
+    path(r'register/', views.register, name='register'),
 
 ]
