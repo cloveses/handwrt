@@ -1,11 +1,11 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
 from .models import CategoryWrite, CategoryContent, User, UserInfo
 from django.core.paginator import Paginator
 from django.urls import reverse
 from django.forms import ModelForm
-import hashlib
+import hashlib, json
 # Create your views here.
 
 def helo(request):
@@ -21,37 +21,55 @@ def mgr(request):
     return render(request, 'mgr.html', {})
 
 
-def user_mgr(request):
-    # page = request.GET.get('page', '0')
-    pass
+# class UserForm(ModelForm):
+#     class Meta:
+#         model = User
+#         fields = ['name', 'passwd', 'email']
+#
+#     def clean_passwd(self):
+#         password1 = self.cleaned_data['password1']
+#         password2 = self.cleaned_data['password2']
+#         if password1 and password2 and password1 != password2:
+#             raise forms.ValidationError('Password do not match!')
+#         return self.make_passwd(password1, self.cleaned_data['email'])
 
-class UserModel(ModelForm):
-    class Meta:
-        model = User
-        fields = ['name', 'passwd', 'email']
 
-    def clean_passwd(self):
-        password1 = self.cleaned_data['password1']
-        password2 = self.cleaned_data['password2']
-        if password1 and password2 and password1 != password2:
-            raise forms.ValidationError('Password do not match!')
-        return self.make_passwd(password1, self.cleaned_data['email'])
-
-    def make_passwd(self, psw, salt):
-        psw = ''.join((psw, salt))
-        psw = psw.encode('utf-8')
-        ret = hashlib.sha512(psw).hexdigest()
-        return ret
+def make_passwd(psw, salt):
+    psw = ''.join((psw, salt))
+    psw = psw.encode('utf-8')
+    ret = hashlib.sha512(psw).hexdigest()
+    return ret
 
 
 def register(request):
     if request.method == 'GET':
-        return render(request, 'reg.html', {})
+        return render(request, 'reg.html', {'info':''})
     else:
-        u = UserModel(request.POST)
-        if u.is_valid():
-            u.save()
-        return HttpResponseRedirect(reverse('helo'))
+        info = ''
+        params = {}
+        keys = ('name', 'password1', 'password2', 'email')
+        for key in keys:
+            params[key] = request.POST.get(key, '').strip()
+        if len(params) != len(keys):
+            info = '你输入的信息不全！'
+        elif params['password1'] != params['password2']:
+            info = '密码不匹配!'
+        else:
+            un = User.objects.filter(name=params['name'])
+            ue = User.objects.filter(email=params['email'])
+            if un or ue:
+                info = '用户名或邮箱已被注册！'
+            else:
+                u = User(name=params['name'], email=params['email'],
+                     passwd=make_passwd(params['name'],params['email']))
+                u.save()
+        if info:
+            resp = render(request, 'reg.html', {'info':info})
+            return  resp
+        else:
+            resp = HttpResponseRedirect(reverse('register'))
+            resp.set_cookie('userid', (u.id))
+            return  resp
 
 
 def category_mgr(request):

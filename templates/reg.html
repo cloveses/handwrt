@@ -1,7 +1,10 @@
 {% extends 'inbase_smpl.html' %}
 
 {% block main %}
-    <form action="{% url 'helo'%}" method="post"  class="pure-form pure-form-stacked">
+    {% if info %}
+    <p>{{info}}</p>
+    {% endif %}
+    <form action="{% url 'register'%}" method="post"  class="pure-form pure-form-stacked">
         {% csrf_token %}
         <fieldset>
             <label for="name">用户名</label>
