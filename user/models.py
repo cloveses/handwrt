@@ -33,8 +33,10 @@ class Union(models.Model):
     create_date = models.DateTimeField(default=datetime.datetime.now)
     content = models.TextField()
 
-# class UnionInfo(models.Model):
-#     union = models.ForeignKey(Union, on_delete=models.CASCADE)
+class UnionInfo(models.Model):
+    union = models.ForeignKey(Union, on_delete=models.CASCADE)
+    content = models.TextField()
+    create_date = models.DateTimeField(default=datetime.datetime.now)
 
 class CategoryWrite(models.Model):
     name = models.CharField(max_length=12, verbose_name='书体名称')

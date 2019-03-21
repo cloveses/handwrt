@@ -13,5 +13,6 @@ urlpatterns = [
     path(r'register/', views.register, name='register'),
     path(r'union_reg/', views.union_reg, name='union_reg'),
     path(r'union_mgr/', views.union_mgr, name='union_mgr'),
+    path(r'union_owner_mgr/', views.union_owner_mgr, name='union_owner_mgr')
 
 ]

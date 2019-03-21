@@ -1,7 +1,7 @@
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
-from .models import CategoryWrite, CategoryContent, User, UserInfo, Union
+from .models import CategoryWrite, CategoryContent, User, UserInfo, Union, UnionInfo
 from django.core.paginator import Paginator
 from django.urls import reverse
 from django.forms import ModelForm
@@ -10,7 +10,8 @@ import hashlib, json
 
 def helo(request):
     # return HttpResponse('heeeeee!')
-    return render(request, 'index.html', {})
+    cws = CategoryWrite.objects.all()
+    return render(request, 'index.html', {'cws':cws})
 
 def make_passwd(psw, salt):
     psw = ''.join((psw, salt))
@@ -167,17 +168,23 @@ def union_mgr(request):
         uid = request.POST.get('id', '')
         if operation and uid and operation.isdigit() and uid.isdigit():
             if operation == '0':
-                User.objects.get(id=int(uid)).delete()
-            elif operation == '1':
-                u = User.objects.get(id=int(uid))
+                u = Union.objects.get(id=int(uid))
                 if u:
                     u.status = 1
-                reason = request.POST.get('reason','')
-                UserInfo(content=reason, user=u).save()
-                u.save()
-            elif operation == '2':
-                u = User.objects.get(id=int(uid))
+                    u.save()
+            elif operation == '1':
+                u = Union.objects.get(id=int(uid))
                 if u:
                     u.status = 2
+                reason = request.POST.get('reason','')
+                UnionInfo(content=reason, union=u).save()
+                u.save()
+            elif operation == '2':
+                u = Union.objects.get(id=int(uid))
+                if u:
+                    u.status = 3
                     u.save()
-        return HttpResponseRedirect(reverse('user_mgr'))
+        return HttpResponseRedirect(reverse('union_mgr'))
+
+def union_owner_mgr(request):
+    return render(request, 'union_owner_mgr.html', {})

@@ -3,24 +3,24 @@
 {% block main %}
 <table class="pure-table pure-table-bordered">
     <tr>
-        <td>用户名</td>
-        <td>邮件地址</td>
-        <td>用户类型</td>
-        <td>用户状态</td>
+        <td>盟团名</td>
+        <td>盟团简介</td>
+        <td>盟团主人</td>
+        <td>盟团状态</td>
         <td>执行操作</td>
     </tr>
     {% for union in unions%}
         <tr>
             <td>{{union.name}}</td>
-            <td>{{union.email}}</td>
-            <td>{{union.permission}}</td>
+            <td>{{union.content}}</td>
+            <td>{{union.owner.name}}</td>
             <td>{{union.status}}</td>
             <td>
                 <form action="{% url 'union_mgr'%}" method="post">
                     {% csrf_token %}
                     <select name="operation">
                         <option style='display: none'></option>
-                        <option value="0">删除</option>
+                        <option value="0">通过</option>
                         <option value="1">警告</option>
                         <option value="2">冻结</option>
                     </select>
