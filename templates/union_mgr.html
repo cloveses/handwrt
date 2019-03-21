@@ -9,14 +9,14 @@
         <td>用户状态</td>
         <td>执行操作</td>
     </tr>
-    {% for user in users%}
+    {% for union in unions%}
         <tr>
-            <td>{{user.name}}</td>
-            <td>{{user.email}}</td>
-            <td>{{user.permission}}</td>
-            <td>{{user.status}}</td>
+            <td>{{union.name}}</td>
+            <td>{{union.email}}</td>
+            <td>{{union.permission}}</td>
+            <td>{{union.status}}</td>
             <td>
-                <form action="{% url 'user_mgr'%}" method="post">
+                <form action="{% url 'union_mgr'%}" method="post">
                     {% csrf_token %}
                     <select name="operation">
                         <option style='display: none'></option>
@@ -25,7 +25,7 @@
                         <option value="2">冻结</option>
                     </select>
                     <input type="text" name="reason" value="" placeholder="警告理由" />
-                    <input name="id" type="hidden" value="{{user.id}}" />
+                    <input name="id" type="hidden" value="{{union.id}}" />
                     <input type="submit" value="确定" />
                 </form>
             </td>

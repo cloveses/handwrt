@@ -11,5 +11,7 @@ urlpatterns = [
     path(r'category_content/add/', views.category_content_add, name='category_content_add'),
     path(r'user_mgr/', views.user_mgr, name='user_mgr'),
     path(r'register/', views.register, name='register'),
+    path(r'union_reg/', views.union_reg, name='union_reg'),
+    path(r'union_mgr/', views.union_mgr, name='union_mgr'),
 
 ]

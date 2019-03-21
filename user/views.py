@@ -1,7 +1,7 @@
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.http import require_http_methods
-from .models import CategoryWrite, CategoryContent, User, UserInfo
+from .models import CategoryWrite, CategoryContent, User, UserInfo, Union
 from django.core.paginator import Paginator
 from django.urls import reverse
 from django.forms import ModelForm
@@ -120,16 +120,16 @@ def user_mgr(request):
         operation = request.POST.get('operation', '')
         uid = request.POST.get('id', '')
         if operation and uid and operation.isdigit() and uid.isdigit():
-            if operation == 0:
+            if operation == '0':
                 User.objects.get(id=int(uid)).delete()
-            elif operation == 1:
+            elif operation == '1':
                 u = User.objects.get(id=int(uid))
                 if u:
                     u.status = 1
                 reason = request.POST.get('reason','')
                 UserInfo(content=reason, user=u).save()
                 u.save()
-            elif operation == 2:
+            elif operation == '2':
                 u = User.objects.get(id=int(uid))
                 if u:
                     u.status = 2
@@ -137,3 +137,47 @@ def user_mgr(request):
         return HttpResponseRedirect(reverse('user_mgr'))
 
 
+def union_reg(request):
+    if request.method == 'GET':
+        return render(request, 'union_reg.html', {'msg':''})
+    else:
+        uid = request.COOKIES.get('userid', '')
+        msg = '申请成功，请耐心等待管理员审核！'
+        name = request.POST.get('name', '').strip()
+        content = request.POST.get('content', '').strip()
+        if uid and uid.isdigit() and name and content:
+            un = Union.objects.filter(name=name)
+            if not un:
+                user = User.objects.get(id=int(uid))
+                un = Union(name=name, content=content, owner=user)
+                un.save()
+            else:
+                msg = '盟团名称已被注册！'
+        else:
+            msg = '信息输入不全！'
+        return render(request, 'union_reg.html', {'msg':msg})
+
+def union_mgr(request):
+    if request.method == 'GET':
+        unions = Union.objects.all()
+        unions = Paginator(unions, 10).page(1)
+        return render(request, 'union_mgr.html', {'unions':unions})
+    elif request.method == 'POST':
+        operation = request.POST.get('operation', '')
+        uid = request.POST.get('id', '')
+        if operation and uid and operation.isdigit() and uid.isdigit():
+            if operation == '0':
+                User.objects.get(id=int(uid)).delete()
+            elif operation == '1':
+                u = User.objects.get(id=int(uid))
+                if u:
+                    u.status = 1
+                reason = request.POST.get('reason','')
+                UserInfo(content=reason, user=u).save()
+                u.save()
+            elif operation == '2':
+                u = User.objects.get(id=int(uid))
+                if u:
+                    u.status = 2
+                    u.save()
+        return HttpResponseRedirect(reverse('user_mgr'))

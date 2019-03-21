@@ -27,12 +27,14 @@ class HandWrite(models.Model):
 class Union(models.Model):
     name = models.CharField(max_length=12, verbose_name='盟团名称')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='管理者')
-    cover = models.ForeignKey(HandWrite, on_delete=models.CASCADE, verbose_name='封面作品')
+    cover = models.ForeignKey(HandWrite, null=True, on_delete=models.CASCADE, verbose_name='封面作品')
+    status = models.IntegerField(default=0, verbose_name='审核状态')
     active = models.IntegerField(default=0, verbose_name='活跃度')
-
-class UnionInfo(models.Model):
+    create_date = models.DateTimeField(default=datetime.datetime.now)
     content = models.TextField()
-    union = models.ForeignKey(Union, on_delete=models.CASCADE)
+
+# class UnionInfo(models.Model):
+#     union = models.ForeignKey(Union, on_delete=models.CASCADE)
 
 class CategoryWrite(models.Model):
     name = models.CharField(max_length=12, verbose_name='书体名称')
