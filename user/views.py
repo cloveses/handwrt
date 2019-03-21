@@ -12,33 +12,29 @@ def helo(request):
     # return HttpResponse('heeeeee!')
     return render(request, 'index.html', {})
 
-@require_http_methods(['POST',])
-def login(request):
-    return JsonResponse({'status':0})
-
-
-def mgr(request):
-    return render(request, 'mgr.html', {})
-
-
-# class UserForm(ModelForm):
-#     class Meta:
-#         model = User
-#         fields = ['name', 'passwd', 'email']
-#
-#     def clean_passwd(self):
-#         password1 = self.cleaned_data['password1']
-#         password2 = self.cleaned_data['password2']
-#         if password1 and password2 and password1 != password2:
-#             raise forms.ValidationError('Password do not match!')
-#         return self.make_passwd(password1, self.cleaned_data['email'])
-
-
 def make_passwd(psw, salt):
     psw = ''.join((psw, salt))
     psw = psw.encode('utf-8')
     ret = hashlib.sha512(psw).hexdigest()
     return ret
+
+
+@require_http_methods(['POST',])
+def login(request):
+    name = request.POST.get('name','').strip()
+    password = request.POST.get('password','').strip()
+    if name and password:
+        u = User.objects.filter(name=name).first()
+        if u:
+            if u.passwd == make_passwd(password, u.name):
+                resp = JsonResponse({'status':0})
+                resp.set_cookie('userid', u.id)
+                return resp
+    return JsonResponse({'status':1})
+
+
+def mgr(request):
+    return render(request, 'mgr.html', {})
 
 
 def register(request):
@@ -50,6 +46,7 @@ def register(request):
         keys = ('name', 'password1', 'password2', 'email')
         for key in keys:
             params[key] = request.POST.get(key, '').strip()
+        print(params)
         if len(params) != len(keys):
             info = '你输入的信息不全！'
         elif params['password1'] != params['password2']:
@@ -60,15 +57,16 @@ def register(request):
             if un or ue:
                 info = '用户名或邮箱已被注册！'
             else:
+                passwd = make_passwd(params['password1'],params['name'])
                 u = User(name=params['name'], email=params['email'],
-                     passwd=make_passwd(params['name'],params['email']))
+                     passwd=passwd)
                 u.save()
         if info:
             resp = render(request, 'reg.html', {'info':info})
             return  resp
         else:
-            resp = HttpResponseRedirect(reverse('register'))
-            resp.set_cookie('userid', (u.id))
+            resp = HttpResponseRedirect(reverse('helo'))
+            resp.set_cookie('userid', u.id)
             return  resp
 
 
