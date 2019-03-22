@@ -73,17 +73,3 @@
     }
   });
 })(Zepto);
-
-
-$(".camera-area").fileUpload({
-        "url": "savetofile.php",
-        "file": "myFile"
-      });
-
-  <div class="camera-area">
-      <form enctype="multipart/form-data" method="post">
-        <input type="file" name="fileToUpload" class="fileToUpload" accept="image/*" capture="camera"/>
-          <div class="upload-progress"><span></span></div>
-        </form>
-      <div class="thumb"></div>
-  </div>

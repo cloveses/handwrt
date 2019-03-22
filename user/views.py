@@ -208,3 +208,14 @@ def union_info(request):
         else:
             warning = None
         return render(request, 'union_info.html', {'union':union, 'warning':warning})
+
+def upload_handwrt(request):
+    if request.method == 'GET':
+        return render(request, 'upload_handwrt.html', {})
+    else:
+        print('aaa')
+        f = request.FILES["fileToUpload"]
+        with open('aa.jpg', 'wb+') as dest:
+            for chunk in f.chunks():
+                dest.write(chunk)
+        return render(request, 'upload_handwrt.html', {})

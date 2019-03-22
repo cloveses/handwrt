@@ -13,7 +13,7 @@
     <div class="pure-menu custom-restricted-width">
         <ul class="pure-menu-list">
             <li class="pure-menu-item"><a id="union_info" href="javascript:void(0);" class="pure-menu-link">盟团信息</a></li>
-            <li class="pure-menu-item"><a id="usermgr" href="javascript:void(0);" class="pure-menu-link">作品上传</a></li>
+            <li class="pure-menu-item"><a id="upload_handwrt" href="javascript:void(0);" class="pure-menu-link">作品上传</a></li>
             <li class="pure-menu-item"><a id="category" href="javascript:void(0);" class="pure-menu-link">盟内作品</a></li>
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">反馈管理</a></li>
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">封面管理</a></li>
@@ -28,8 +28,8 @@
         $('body').on('click','#union_info',function(){
             $('#frame_main').attr('src','{%url 'union_info'%}');
         });
-        $('body').on('click','#category',function(){
-            $('#frame_main').attr('src','/user/category_write/');
+        $('body').on('click','#upload_handwrt',function(){
+            $('#frame_main').attr('src','{%url 'upload_handwrt'%}');
         });
         $('body').on('click','#usermgr',function(){
             $('#frame_main').attr('src','/user/user_mgr/');
