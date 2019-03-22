@@ -1,0 +1,28 @@
+{% extends 'inbase_smpl.html' %}
+
+{% block main %}
+    {% if not union %}
+    <p>你尚未拥有盟团哦！</p>
+    {% else %}
+    <h3>{{union.name}}</h3>
+        {% if union.status == 0 %}
+            <h4>未审核</h4>
+        {% elif union.status == 3 %}
+            <h4>已关闭</h4>
+        {% endif %}
+        {% if warning%}
+            <h4>{{warning}}</h4>
+        {% endif %}
+    <div>{{union.content}}</div>
+    {% endif %}
+<!--     <form action="{% url 'union_reg'%}" method="post"  class="pure-form pure-form-stacked">
+        {% csrf_token %}
+        <fieldset>
+            <label for="name">盟团名称</label>
+            <input id="name" type="text" name="name" value="" placeholder="盟团名称" />
+            <label for="content">盟团简介</label>
+            <textarea id="content" name="content"></textarea>
+            <input type="submit" value="确定" class="pure-button pure-button-primary" />
+        </fieldset>
+    </form> -->
+{% endblock %}

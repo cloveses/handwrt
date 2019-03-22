@@ -1,7 +1,7 @@
 {% extends 'inbase.html' %}
 
 {% block left %}
-    <table>
+    <table class="pure-table pure-table-bordered">
         <tr>
             <td>书体名称</td>
             <td>操作</td>
@@ -22,7 +22,7 @@
 {% endblock %}
 
 {% block right %}
-    <table>
+    <table class="pure-table pure-table-bordered">
         <tr>
             <td>分类名称</td>
             <td>父级分类</td>
@@ -41,6 +41,7 @@
         {% csrf_token %}
         <input type="text" name="name" placeholder="分类名称" />
         <select name="parent">
+            <option style='display: none'>无</option>
             {% for p in parent_contents %}
                 <option value="{{p.id}}">{{p.name}}</option>
             {% endfor %}

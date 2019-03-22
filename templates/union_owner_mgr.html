@@ -12,7 +12,7 @@
     </style>
     <div class="pure-menu custom-restricted-width">
         <ul class="pure-menu-list">
-            <li class="pure-menu-item"><a id="unionmgr" href="javascript:void(0);" class="pure-menu-link">盟团信息</a></li>
+            <li class="pure-menu-item"><a id="union_info" href="javascript:void(0);" class="pure-menu-link">盟团信息</a></li>
             <li class="pure-menu-item"><a id="usermgr" href="javascript:void(0);" class="pure-menu-link">作品上传</a></li>
             <li class="pure-menu-item"><a id="category" href="javascript:void(0);" class="pure-menu-link">盟内作品</a></li>
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">反馈管理</a></li>
@@ -25,8 +25,8 @@
 <iframe id="frame_main" src="" style="width: 100%;min-height:500px;border:0;"></iframe>
 <script type="text/javascript">
     $(function(){
-        $('body').on('click','#unionmgr',function(){
-            $('#frame_main').attr('src','/user/union_mgr/');
+        $('body').on('click','#union_info',function(){
+            $('#frame_main').attr('src','{%url 'union_info'%}');
         });
         $('body').on('click','#category',function(){
             $('#frame_main').attr('src','/user/category_write/');

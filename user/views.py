@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.urls import reverse
 from django.forms import ModelForm
 import hashlib, json
+import datetime
 # Create your views here.
 
 def helo(request):
@@ -104,11 +105,16 @@ def category_write_add(request):
 def category_content_add(request):
     name = request.POST.get('name', '')
     pid = request.POST.get('parent', '')
+    if not pid:
+        pid = '0'
     if name and pid and pid.isdigit():
         pid = int(pid)
-        p = CategoryContent.objects.get(id=pid)
-        if p:
-            CategoryContent(name=name, parent=p).save()
+        if pid == 0:
+            CategoryContent(name=name).save()
+        else:
+            p = CategoryContent.objects.get(id=pid)
+            if p:
+                CategoryContent(name=name, parent=p).save()
     return HttpResponseRedirect(reverse('category_mgr'))
 
 
@@ -188,3 +194,17 @@ def union_mgr(request):
 
 def union_owner_mgr(request):
     return render(request, 'union_owner_mgr.html', {})
+
+def union_info(request):
+    uid = request.COOKIES.get('userid', '')
+    if not uid or not uid.isdigit():
+        return render(request, 'union_info.html', {'union':None,'warning':None})
+    else:
+        u = User.objects.get(id=int(uid))
+        union = Union.objects.filter(owner=u).first()
+        warning = UnionInfo.objects.filter(union=union).all().order_by('-create_date').first()
+        if warning and (datetime.datetime.now() - warning.create_date).days <= 5:
+            warning = warning.content
+        else:
+            warning = None
+        return render(request, 'union_info.html', {'union':union, 'warning':warning})
