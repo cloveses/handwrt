@@ -41,7 +41,7 @@
         {% csrf_token %}
         <input type="text" name="name" placeholder="分类名称" />
         <select name="parent">
-            <option style='display: none'>无</option>
+            <option style='display: none'></option>
             {% for p in parent_contents %}
                 <option value="{{p.id}}">{{p.name}}</option>
             {% endfor %}

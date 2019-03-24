@@ -1,0 +1,18 @@
+{% extends 'inbase_smpl.html' %}
+{% load static %}
+{% block main %}
+  <table class="pure-table">
+      <tr>
+          <td><h2>{{hw.name}}</h2></td>
+      </tr>
+      <tr>
+          <td><h2>{{hw.create_date}}</h2></td>
+      </tr>
+      <tr>
+          <td><img src="{%static hw.file_path%}" /></td>
+      </tr>
+      <tr>
+          <td><h2>{{hw.info}}</h2></td>
+      </tr>
+  </table>
+{% endblock %}

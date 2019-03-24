@@ -1,21 +1,70 @@
 {% extends 'inbase_smpl.html' %}
 {% load static %}
-{% block scrpt %}
-    <script type="text/javascript"  src="{% static 'upload.js' %}"></script>
-{% endblock %}
-
 {% block main %}
-  <div class="camera-area">
-      <form enctype="multipart/form-data" method="post">
-        <input type="file" name="fileToUpload" class="fileToUpload" accept="image/*" capture="camera"/>
-          <div class="upload-progress"><span></span></div>
-      </form>
-      <div class="thumb"></div>
-  </div>
-  <script type="text/javascript">
-      $(".camera-area").fileUpload({
-        "url": {%url 'upload_handwrt' %},
-        "file": "myFile",
-      });
-  </script>
+  <table class="pure-table pure-table-bordered">
+      <tr>
+          <td>作品主题</td>
+          <td>书体分类</td>
+          <td>内容分类</td>
+          <td>上传日期</td>
+          <td>上传用户</td>
+          <td>审核标志</td>
+          <td>执行操作</td>
+      </tr>
+      {% for hw in hws%}
+          <tr>
+              <td>{{hw.title}}</td>
+              <td>{{hw.category_write.name}}</td>
+              <td>{{hw.category_content.name}}</td>
+              <td>{{hw.create_date}}</td>
+              <td>{{hw.owner.name}}</td>
+              <td>
+                {% if hw.flag %}已审核{%else%}未审核{%endif%}
+              </td>
+              <td>
+                  <form action="" method="post">
+                      {% csrf_token %}
+                      <select name="operation">
+                          <option style='display: none'></option>
+                          <option value="0">通过</option>
+                          <option value="1">冻结</option>
+                      </select>
+                      <input name="id" type="hidden" value="{{hw.id}}" />
+                      <input type="submit" value="确定" />
+                  </form>
+              </td>
+          </tr>
+      {% endfor %}
+  </table>
+
+  <form action="" method="post" enctype="multipart/form-data"  class="pure-form">
+    <fieldset>
+      <label for="title">作品名称：</label>
+      <input id="title" type="text" name="title" />
+      <label for="myfile">上传文件</label>
+      <input id="myfile" type="file" name="myfile" />
+      <label for="info">作品简介</label>
+      <textarea id="info" name="info"></textarea>
+      <label for="category_write">书体类别</label>
+      <select id="category_write" name="category_write">
+        {%for category_write in category_writes%}
+          <option value="{{category_write.id}}">{{category_write.name}}</option>
+        {%endfor%}
+      </select>
+      <label for="category_content">内容分类</label>
+      <select id="category_content" name="category_content">
+        {%for category_content in category_contents%}
+          <option value="{{category_content.id}}">{{category_content.name}}</option>
+        {%endfor%}
+      </select>
+      <label for="category_super">管理员分类</label>
+      <select id="category_super" name="category_super">
+        <option value="0">书法资料</option>
+        <option value='1'>名家书法</option>
+      </select>
+      <input type="hidden" name="operation" value="2" />
+      {%csrf_token%}
+      <input type="submit" name="sub" value="添加" />
+    </fieldset>
+  </form>
 {% endblock %}

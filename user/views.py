@@ -1,18 +1,17 @@
 from django.shortcuts import render, render_to_response
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.views.decorators.http import require_http_methods
-from .models import CategoryWrite, CategoryContent, User, UserInfo, Union, UnionInfo
+from .models import CategoryWrite, CategoryContent, User, UserInfo, Union, UnionInfo, HandWrite
 from django.core.paginator import Paginator
 from django.urls import reverse
 from django.forms import ModelForm
-import hashlib, json
+import hashlib, json, os
 import datetime
+from django.utils.timezone import utc
 # Create your views here.
-
-def helo(request):
-    # return HttpResponse('heeeeee!')
-    cws = CategoryWrite.objects.all()
-    return render(request, 'index.html', {'cws':cws})
+SUPER_PERM = [0,]
+UNION_PERM = [1,]
+SUPER_UNION = [0, 1]
 
 def make_passwd(psw, salt):
     psw = ''.join((psw, salt))
@@ -20,6 +19,33 @@ def make_passwd(psw, salt):
     ret = hashlib.sha512(psw).hexdigest()
     return ret
 
+
+def login_error(request, utypes=None):
+    u = request.COOKIES.get('userid','').strip()
+    utype = request.COOKIES.get('utype','').strip()
+    if not u or not utype:
+        return True
+    if utypes and utype and int(utype) not in utypes:
+        return True
+
+def get_category_content_menus():
+    menus = {}
+    parent_contents = CategoryContent.objects.filter(parent=None).all()
+    for parent_content in parent_contents:
+        children = CategoryContent.objects.filter(parent=parent_content).all()
+        children_menus = [(child.id,child.name) for child in children]
+        print(children_menus)
+        menus[(parent_content.id, parent_content.name)] = children_menus
+    return menus
+
+
+def helo(request):
+    # return HttpResponse('heeeeee!')
+    username = request.COOKIES.get('username','').strip()
+    utype = request.COOKIES.get('utype','').strip()
+    cws = CategoryWrite.objects.all()
+    return render(request, 'index.html', 
+        {'cws':cws, 'utype':utype, 'username':username,'menus':get_category_content_menus()})
 
 @require_http_methods(['POST',])
 def login(request):
@@ -31,13 +57,23 @@ def login(request):
             if u.passwd == make_passwd(password, u.name):
                 resp = JsonResponse({'status':0})
                 resp.set_cookie('userid', u.id)
+                resp.set_cookie('username', u.name)
+                resp.set_cookie('utype', u.permission)
                 return resp
     return JsonResponse({'status':1})
 
 
-def mgr(request):
-    return render(request, 'mgr.html', {})
+# def mgr(request):
+#     permission = request.COOKIES.get('utype','')
+#     if permission == '0':
+#         return render(request, 'mgr.html', {})
+#     else:
+#         return HttpResponseNotFound('<h1>Page not found</h1>')
 
+def mgr(request):
+    if login_error(request, SUPER_PERM):
+        return HttpResponseRedirect(reverse('helo'))
+    return render(request, 'mgr.html', {})
 
 def register(request):
     if request.method == 'GET':
@@ -71,8 +107,9 @@ def register(request):
             resp.set_cookie('userid', u.id)
             return  resp
 
-
 def category_mgr(request):
+    if login_error(request, SUPER_PERM):
+        return HttpResponseRedirect(reverse('helo'))
     category_writes = CategoryWrite.objects.all()
     category_writes = Paginator(category_writes, 10).page(1)
     category_contents = CategoryContent.objects.all()
@@ -84,6 +121,8 @@ def category_mgr(request):
 
 
 def category_write_del(request, id=''):
+    if login_error(request, SUPER_PERM):
+        return HttpResponseRedirect(reverse('helo'))
     if id:
         id = int(id)
         CategoryWrite.objects.get(id=id).delete()
@@ -97,16 +136,22 @@ class CategoryWriteForm(ModelForm):
 
 
 def category_write_add(request):
+    if login_error(request, SUPER_PERM):
+        return HttpResponseRedirect(reverse('helo'))
     form = CategoryWriteForm(request.POST)
     if form.is_valid():
         form.save()
     return HttpResponseRedirect(reverse('category_mgr'))
 
+
 def category_content_add(request):
+    if login_error(request, SUPER_PERM):
+        return HttpResponseRedirect(reverse('helo'))
     name = request.POST.get('name', '')
     pid = request.POST.get('parent', '')
     if not pid:
         pid = '0'
+    print(name, pid)
     if name and pid and pid.isdigit():
         pid = int(pid)
         if pid == 0:
@@ -117,8 +162,18 @@ def category_content_add(request):
                 CategoryContent(name=name, parent=p).save()
     return HttpResponseRedirect(reverse('category_mgr'))
 
+def category_content_del(request, id=''):
+    if login_error(request, SUPER_PERM):
+        return HttpResponseRedirect(reverse('helo'))
+    if id:
+        id = int(id)
+        CategoryContent.objects.get(id=id).delete()
+    return HttpResponseRedirect(reverse('category_mgr'))
+
 
 def user_mgr(request):
+    if login_error(request, SUPER_PERM):
+        return HttpResponseRedirect(reverse('helo'))
     if request.method == 'GET':
         users = User.objects.all()
         users = Paginator(users, 10).page(1)
@@ -143,8 +198,9 @@ def user_mgr(request):
                     u.save()
         return HttpResponseRedirect(reverse('user_mgr'))
 
-
 def union_reg(request):
+    if login_error(request):
+        return HttpResponseRedirect(reverse('helo'))
     if request.method == 'GET':
         return render(request, 'union_reg.html', {'msg':''})
     else:
@@ -164,7 +220,10 @@ def union_reg(request):
             msg = '信息输入不全！'
         return render(request, 'union_reg.html', {'msg':msg})
 
+
 def union_mgr(request):
+    if login_error(request, SUPER_PERM):
+        return HttpResponseRedirect(reverse('helo'))
     if request.method == 'GET':
         unions = Union.objects.all()
         unions = Paginator(unions, 10).page(1)
@@ -177,6 +236,8 @@ def union_mgr(request):
                 u = Union.objects.get(id=int(uid))
                 if u:
                     u.status = 1
+                    u.owner.permission = 1
+                    u.owner.save()
                     u.save()
             elif operation == '1':
                 u = Union.objects.get(id=int(uid))
@@ -192,8 +253,12 @@ def union_mgr(request):
                     u.save()
         return HttpResponseRedirect(reverse('union_mgr'))
 
+
 def union_owner_mgr(request):
+    if login_error(request, UNION_PERM):
+        return HttpResponseRedirect(reverse('helo'))
     return render(request, 'union_owner_mgr.html', {})
+
 
 def union_info(request):
     uid = request.COOKIES.get('userid', '')
@@ -203,19 +268,102 @@ def union_info(request):
         u = User.objects.get(id=int(uid))
         union = Union.objects.filter(owner=u).first()
         warning = UnionInfo.objects.filter(union=union).all().order_by('-create_date').first()
-        if warning and (datetime.datetime.now() - warning.create_date).days <= 5:
+        if warning and (datetime.datetime.utcnow().replace(tzinfo=utc) - warning.create_date).days <= 5:
             warning = warning.content
         else:
             warning = None
         return render(request, 'union_info.html', {'union':union, 'warning':warning})
 
-def upload_handwrt(request):
+
+# 作品管理
+def handwrt_mgr(request):
+    if login_error(request, SUPER_UNION):
+        return HttpResponseRedirect(reverse('helo'))
+    hws = HandWrite.objects.all()
+    category_writes = CategoryWrite.objects.all()
+    category_contents = CategoryContent.objects.all()
+    utype = request.COOKIES.get('utype')
     if request.method == 'GET':
-        return render(request, 'upload_handwrt.html', {})
+        return render(request, 'upload_handwrt.html', 
+            {'hws':hws, 'category_writes':category_writes,
+            'category_contents':category_contents, 'utype':utype})
     else:
-        print('aaa')
-        f = request.FILES["fileToUpload"]
-        with open('aa.jpg', 'wb+') as dest:
-            for chunk in f.chunks():
-                dest.write(chunk)
-        return render(request, 'upload_handwrt.html', {})
+        operation = request.POST.get('operation', '').strip()
+        if operation == '2':
+            u = request.COOKIES.get('userid','').strip()
+            u = User.objects.get(id=int(u))
+            category_write = request.POST.get('category_write')
+            category_content = request.POST.get('category_content')
+            title = request.POST.get('title','')
+            info = request.POST.get('info','')
+            if title and category_write and category_content:
+                category_write = CategoryWrite.objects.get(id=int(category_write))
+                category_content = CategoryContent.objects.get(id=int(category_content))
+                f = request.FILES["myfile"]
+                filename = f.name
+                ext = filename[filename.index('.'):] if '.' in filename else '.jpg'
+                filename = hashlib.md5(filename.encode()).hexdigest()
+                if os.path.exists(filename+ext):
+                    filename = filename+'1'+ext
+                else:
+                    filename = filename+ext
+                if utype == '1':
+                    HandWrite(title=title, info=info, category_write=category_write,
+                        category_content=category_content,file_path=filename, owner=u).save()
+                else:
+                    category_super = int(request.POST.get('category_super'))
+                    HandWrite(title=title, info=info, category_write=category_write, flag=True,
+                        category_content=category_content,file_path=filename, owner=u, 
+                        category_super=category_super).save()
+
+                with open(os.path.join('static','hws',filename), 'wb+') as dest:
+                    for chunk in f.chunks():
+                        dest.write(chunk)
+        else:
+            hid = request.POST.get('id','').strip()
+            if hid and hid.isdigit():
+                hw = HandWrite.objects.get(id=(int(hid)))
+                if operation == '0':
+                    hw.flag = True
+                    hw.save()
+                elif operation == '1':
+                    hw.flag = False
+                    hw.save()
+        return render(request, 'upload_handwrt.html', 
+            {'hws':hws, 'category_writes':category_writes,
+            'category_contents':category_contents, 'utype':utype})
+
+
+def get_handwrt_writes(request):
+    cid = request.GET.get('id').strip()
+    category_write = CategoryWrite.objects.get(id=int(cid))
+    hws = HandWrite.objects.filter(category_write=category_write).all()
+    return render(request, 'displays.html', {'hws':hws})
+    
+def display(request):
+    hid = request.GET.get('id', '').strip()
+    hw = HandWrite.objects.get(id=hid)
+    hw.score += 1
+    hw.save()
+    print(hw.file_path)
+    return render(request, 'display.html', {'hw':hw})
+
+def get_handwrt_contents(request):
+    cid = request.GET.get('id').strip()
+    category_content = CategoryContent.objects.get(id=int(cid))
+    hws = HandWrite.objects.filter(category_content=category_content).all()
+    return render(request, 'displays.html', {'hws':hws})
+    
+def get_handwrt_category_supers(request):
+    cid = request.GET.get('id').strip()
+    hws = HandWrite.objects.filter(category_super=int(cid)).all()
+    return render(request, 'displays.html', {'hws':hws})
+
+
+def search(request):
+    key = request.GET.get('key','').strip()
+    if key:
+        hws = HandWrite.objects.filter(title__contains=key).all()[:10]
+    else:
+        hws = HandWrite.objects.all().order_by('-create_date')[:10]
+    return render(request, 'displays.html', {'hws':hws})

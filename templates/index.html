@@ -1,25 +1,56 @@
 {% extends 'base.html' %}
 
 {% block title %}首页{% endblock %}
-
-{% block top %}
+{%block topright%}
     <div>
+        {%if username%}
+        <h3 id="username">欢迎你：<span id="current_user">{{username}}</span></h3>
+        {%else%}
         <a class="pure-button" id="login_btn" href="javascript:void(0);">登录</a>
+        <h3> id="username" style="display: none;">欢迎你：<span id="current_user">{{username}}</span></h3>
+        {%endif%}
     </div>
-    <div class="pure-g">
-        <div  class="pure-u-2-3" style="text-align: center;">
+{%endblock%}
+{% block top %}
+    <div class="pure-g" style="background-color: #333;">
+        <div  class="pure-u-10-24" style="text-align: right;">
             <div class="pure-menu pure-menu-horizontal">
                 <ul class="pure-menu-list">
-                    <li class="pure-menu-item"><a id="" href="javascript:void(0);" class="pure-menu-link">书法资料</a></li>
-                    <li class="pure-menu-item"><a id="" href="javascript:void(0);" class="pure-menu-link">名家书法</a></li>
-                    <li class="pure-menu-item"><a id="" href="javascript:void(0);" class="pure-menu-link">我的主页</a></li>
+<!--                 <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link">Home</a></li>
+-->
+                    {%for menu,menu_ches in menus.items%}
+                    <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+                        <a href="javascript:void(0);" ccid="{{menu.0}}" id="menuLink{{menu.0}}" class="pure-menu-link menu_link_cc">{{menu.1}}</a>
+                        <ul class="pure-menu-children">
+                        {%for menu_ch in menu_ches%}
+                            <li class="pure-menu-item"><a href="javascript:void(0);" ccid="{{menu_ch.0}}" class="pure-menu-link menu_link_cc">{{menu_ch.1}}</a></li>
+                        {%endfor%}
+                        </ul>
+                    </li>
+                    {%endfor%}
                 </ul>
             </div>
         </div>
-        <div  class="pure-u-1-3">
-            <form action=""  class="pure-form" >
-                <input type="text" name="key" />
-                <input type="submit" value="综合标题检索"  class="pure-button pure-button-primary" />
+
+        <div  class="pure-u-7-24" style="text-align: left;">
+            <div class="pure-menu pure-menu-horizontal">
+                <ul class="pure-menu-list">
+                    <li class="pure-menu-item"><a csid="0" href="javascript:void(0);" class="pure-menu-link menu_link_cs">书法资料</a></li>
+                    <li class="pure-menu-item"><a csid="1" href="javascript:void(0);" class="pure-menu-link menu_link_cs">名家书法</a></li>
+                    {%if utype == '0'%}
+                    <li class="pure-menu-item"><a href="{%url 'mgr'%}" class="pure-menu-link">我的主页</a></li>
+                    {%elif utype == '1'%}
+                    <li class="pure-menu-item"><a href="{%url 'union_owner_mgr'%}" class="pure-menu-link">我的主页</a></li>
+                    {%elif utype == '2'%}
+                    <li class="pure-menu-item"><a href="{%url 'mgr'%}" class="pure-menu-link">我的主页</a></li>
+                    {%endif%}
+                </ul>
+            </div>
+        </div>
+        <div  class="pure-u-6-24">
+            <form class="pure-form" >
+                <input id="key" type="text" name="key" placeholder="检索关键字" />
+                <button id="search"  type="button" class="pure-button pure-button-primary">综合标题检索</button>
             </form>
         </div>
     </div>
@@ -33,10 +64,10 @@
             color: red;
         }
     </style>
-    <div class="pure-menu custom-restricted-width">
+    <div class="pure-menu custom-restricted-width" style="background-color: #666;border-radius: 4px;">
         <ul class="pure-menu-list">
             {% for cw in cws %}
-            <li class="pure-menu-item"><a href="javascript:void(0);" class="pure-menu-link">{{cw.name}}</a></li>
+            <li class="pure-menu-item"><a cwid={{cw.id}} href="javascript:void(0);" class="pure-menu-link menu_link">{{cw.name}}</a></li>
             {% endfor %}
         </ul>
     </div>
@@ -46,16 +77,19 @@
 <iframe id="frame_main" src="" style="width: 100%;min-height:500px;border:0;"></iframe>
 <script type="text/javascript">
     $(function(){
-        $('body').on('click','#unionmgr',function(){
-            $('#frame_main').attr('src','/user/union_mgr/');
+        $('body').on('click','.menu_link',function(){
+            $('#frame_main').attr('src',"{%url 'get_handwrt_writes'%}?id="+$(this).attr('cwid'));
         });
-        $('body').on('click','#category',function(){
-            $('#frame_main').attr('src','/user/category_write/');
+        $('body').on('click','.menu_link_cc',function(){
+            $('#frame_main').attr('src',"{%url 'get_handwrt_contents'%}?id="+$(this).attr('ccid'));
         });
-        $('body').on('click','#usermgr',function(){
-            $('#frame_main').attr('src','/user/user_mgr/');
+         $('body').on('click','.menu_link_cs',function(){
+            $('#frame_main').attr('src',"{%url 'get_handwrt_category_supers'%}?id="+$(this).attr('csid'));
         });
-    });
+         $('body').on('click','#search',function(){
+            $('#frame_main').attr('src',"{%url 'search'%}?key="+$('#key').val());
+        });
+   });
 </script>
 {% endblock %}
 
@@ -103,9 +137,11 @@ $(function(){
         passwordLi.append(passWordInput);
 
         var submitLi = $('<li />',{class:'loginLi'});
-        var submitBtn = $('<input />', {type: 'submit', value: '登陆'});
+        var submitBtn = $('<input />', {type: 'submit', value: '登陆', id:'login'});
+        var cancelBtn = $('<input />', {type: 'reset', value: '取消', id:'cancel'});
         var stateLi = $('<li />',{class:'loginLi'});
         submitLi.append(submitBtn);
+        submitLi.append(cancelBtn);
         ul.append(nameLi);
         ul.append(passwordLi);
         ul.append(submitLi);
@@ -144,8 +180,11 @@ $(function(){
 
         field.css('background-color','#DDD');
         var token = $("input[name='csrfmiddlewaretoken']").val();
+        submitLi.on('click', '#cancel',function(){
+            field.hide();
+        });
         //上传事件
-        submitLi.on('click',function () {
+        submitLi.on('click', '#login', function () {
             $.ajax({
                 type: 'POST',
                 url: '/user/login/',//提交的地址
@@ -158,6 +197,9 @@ $(function(){
                         stateLi.text('登录失败！');
                     }else{
                     field.hide();
+                     $('#login_btn').hide();
+                    $('#username').show();
+                    $('#current_user').text(nameInput.val());
                     }
                 },
                 error: function (xhr, type) {

@@ -14,25 +14,35 @@
     </style>
 </head>
 <body>
+    <div class="pure-g" style="background-color: #333;color: #DDD;">
+        <div class="pure-u-1-2">
+            {% block topleft %}
+                <img src="{% static 'er.png' %}" />
+            {% endblock %}
+        </div>
+        <div class="pure-u-1-2">
+            {% block topright %}
+            {% endblock %}
+        </div>
+    </div>
     <div class="pure-g">
-        <img src="{% static 'er.png' %}" />
         <div class="pure-u-24-24">
             {% block top %}{% endblock %}
         </div>
     </div>
 
     <div class="pure-g">
-        <div class="pure-u-1-4">
+        <div class="pure-u-3-24">
             <div id="side">
                 {% block side %}{% endblock %}
             </div>
         </div>
-        <div class="pure-u-3-4">
+        <div class="pure-u-21-24">
             {% block main %}{% endblock %}
         </div>
     </div>
 
-    <div class="pure-g">
+    <div class="pure-g"  style="background-color: #000;color: #CCC;">
         <div class="pure-u-24-24" style="text-align:center;">
             <p>copyright 版权所有</p>
             <p>技术支持：盟友公司</p>

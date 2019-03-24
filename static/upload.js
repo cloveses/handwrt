@@ -73,3 +73,16 @@
     }
   });
 })(Zepto);
+  // <div class="camera-area">
+  //     <form enctype="multipart/form-data" method="post">
+  //       <input type="file" name="fileToUpload" class="fileToUpload" accept="image/*" capture="camera"/>
+  //         <div class="upload-progress"><span></span></div>
+  //     </form>
+  //     <div class="thumb"></div>
+  // </div>
+  // <script type="text/javascript">
+  //     $(".camera-area").fileUpload({
+  //       "url": {%url 'upload_handwrt' %},
+  //       "file": "myFile",
+  //     });
+  // </script>

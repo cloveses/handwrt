@@ -23,15 +23,20 @@ class HandWrite(models.Model):
     flag = models.BooleanField(default=False, verbose_name='审核情况')
     score = models.IntegerField(default=0, verbose_name='点赞数')
     file_path = models.CharField(max_length=256)
+    create_date = models.DateTimeField(default=datetime.datetime.now)
+    owner = models.ForeignKey('User', null=True, on_delete=models.CASCADE)
+    category_super = models.IntegerField(null=True, default=0, verbose_name='管理员的分类')
+    # union = models.ForeignKey('Union', on_delete=models.CASCADE, null=True)
 
 class Union(models.Model):
     name = models.CharField(max_length=12, verbose_name='盟团名称')
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='管理者')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner', verbose_name='管理者')
     cover = models.ForeignKey(HandWrite, null=True, on_delete=models.CASCADE, verbose_name='封面作品')
     status = models.IntegerField(default=0, verbose_name='审核状态')
     active = models.IntegerField(default=0, verbose_name='活跃度')
     create_date = models.DateTimeField(default=datetime.datetime.now)
     content = models.TextField()
+    users = models.ManyToManyField(User, related_name='members')
 
 class UnionInfo(models.Model):
     union = models.ForeignKey(Union, on_delete=models.CASCADE)

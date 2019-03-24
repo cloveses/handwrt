@@ -2,7 +2,7 @@
 
 {% block title %}网站管理{% endblock %}
 
-{% block top %}欢迎超管！{% endblock %}
+{% block topright %}<h3>欢迎来到超管页面！</h3>{% endblock %}
 
 {% block side %}
     <style type="text/css">
@@ -10,18 +10,18 @@
             color: red;
         }
     </style>
-    <div class="pure-menu custom-restricted-width">
+    <div class="pure-menu custom-restricted-width" style="background-color: #666;border-radius: 4px;">
         <ul class="pure-menu-list">
             <li class="pure-menu-item"><a id="unionmgr" href="javascript:void(0);" class="pure-menu-link">管理盟</a></li>
             <li class="pure-menu-item"><a id="usermgr" href="javascript:void(0);" class="pure-menu-link">管理用户</a></li>
             <li class="pure-menu-item"><a id="category" href="javascript:void(0);" class="pure-menu-link">标签设置</a></li>
-            <li class="pure-menu-item"><a href="#" class="pure-menu-link">作品管理</a></li>
+            <li class="pure-menu-item"><a id="handwrt_mgr" href="javascript:void(0)" class="pure-menu-link">作品管理</a></li>
         </ul>
     </div>
 {% endblock %}
 
 {% block main %}
-<iframe id="frame_main" src="" style="width: 100%;min-height:500px;border:0;"></iframe>
+<iframe id="frame_main" src="{%url 'union_mgr'%}" style="width: 100%;min-height:500px;border:0;"></iframe>
 <script type="text/javascript">
     $(function(){
         $('body').on('click','#unionmgr',function(){
@@ -32,6 +32,9 @@
         });
         $('body').on('click','#usermgr',function(){
             $('#frame_main').attr('src','/user/user_mgr/');
+        });
+        $('body').on('click','#handwrt_mgr',function(){
+            $('#frame_main').attr('src','/user/handwrt_mgr/');
         });
     });
 </script>

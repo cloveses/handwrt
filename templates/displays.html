@@ -1,0 +1,20 @@
+{% extends 'inbase_smpl.html' %}
+{% load static %}
+{% block main %}
+  <table class="pure-table pure-table-bordered">
+      <tr>
+          <td>作品主题</td>
+          <td>作品简介</td>
+          <td>上传者</td>
+          <td>上传时间</td>
+      </tr>
+      {% for hw in hws%}
+          <tr>
+              <td><a href="{%url 'display'%}?id={{hw.id}}" target="_blank">{{hw.title}}</a></td>
+              <td>{{hw.info}}</td>
+              <td>{{hw.owner.name}}</td>
+              <td>{{hw.create_date}}</td>
+          </tr>
+      {% endfor %}
+  </table>
+{% endblock %}
