@@ -105,6 +105,8 @@ def register(request):
         else:
             resp = HttpResponseRedirect(reverse('helo'))
             resp.set_cookie('userid', u.id)
+            resp.set_cookie('utype', u.permission)
+            resp.set_cookie('username',u.name)
             return  resp
 
 def category_mgr(request):

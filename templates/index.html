@@ -4,10 +4,10 @@
 {%block topright%}
     <div>
         {%if username%}
-        <h3 id="username">欢迎你：<span id="current_user">{{username}}</span></h3>
+        <h3 id="username">欢迎你：<span id="current_user">{{username}}</span><button id="logout" class="pure-button pure-button-primary">注销</button></h3>
         {%else%}
-        <a class="pure-button" id="login_btn" href="javascript:void(0);">登录</a>
-        <h3> id="username" style="display: none;">欢迎你：<span id="current_user">{{username}}</span></h3>
+        <a class="pure-button pure-button-primary" id="login_btn" href="javascript:void(0);">登录</a><button class="pure-button pure-button-primary" id="signup">注册</button>
+        <h3 style="display: none;" id="username">欢迎你：<span id="current_user">{{username}}</span><button id="logout">注销</button></h3>
         {%endif%}
     </div>
 {%endblock%}
@@ -16,8 +16,6 @@
         <div  class="pure-u-10-24" style="text-align: right;">
             <div class="pure-menu pure-menu-horizontal">
                 <ul class="pure-menu-list">
-<!--                 <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link">Home</a></li>
--->
                     {%for menu,menu_ches in menus.items%}
                     <li class="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
                         <a href="javascript:void(0);" ccid="{{menu.0}}" id="menuLink{{menu.0}}" class="pure-menu-link menu_link_cc">{{menu.1}}</a>
@@ -74,7 +72,7 @@
 {% endblock %}
 
 {% block main %}
-<iframe id="frame_main" src="" style="width: 100%;min-height:500px;border:0;"></iframe>
+<iframe id="frame_main" src="" style="width: 100%;min-height:700px;border:0;"></iframe>
 <script type="text/javascript">
     $(function(){
         $('body').on('click','.menu_link',function(){
@@ -88,6 +86,15 @@
         });
          $('body').on('click','#search',function(){
             $('#frame_main').attr('src',"{%url 'search'%}?key="+$('#key').val());
+        });
+        $('body').on('click','#logout',function(){
+            $.fn.cookie('username', '000', { expires: -1, path:'/' });
+            $.fn.cookie('userid', '000', { expires: -1, path:'/' });
+            $.fn.cookie('utype', '000', { expires: -1, path:'/' });
+            window.location.href="{%url 'helo'%}";
+        });
+         $('body').on('click','#signup',function(){
+            window.location.href="{%url 'register'%}";
         });
    });
 </script>
