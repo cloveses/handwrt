@@ -12,7 +12,7 @@
     </style>
     <div class="pure-menu custom-restricted-width" style="background-color: #666;border-radius: 4px;">
         <ul class="pure-menu-list">
-            <li class="pure-menu-item"><a id="unionmgr" href="javascript:void(0);" class="pure-menu-link">管理盟</a></li>
+            <li class="pure-menu-item"><a id="unionmgr" href="javascript:void(0);" class="pure-menu-link">管理盟团</a></li>
             <li class="pure-menu-item"><a id="usermgr" href="javascript:void(0);" class="pure-menu-link">管理用户</a></li>
             <li class="pure-menu-item"><a id="category" href="javascript:void(0);" class="pure-menu-link">标签设置</a></li>
             <li class="pure-menu-item"><a id="handwrt_mgr" href="javascript:void(0)" class="pure-menu-link">作品管理</a></li>
@@ -21,20 +21,20 @@
 {% endblock %}
 
 {% block main %}
-<iframe id="frame_main" src="{%url 'union_mgr'%}" style="width: 100%;min-height:500px;border:0;"></iframe>
+<iframe id="frame_main" src="{%url 'union_mgr'%}" style="width: 100%;min-height:700px;border:0;"></iframe>
 <script type="text/javascript">
     $(function(){
         $('body').on('click','#unionmgr',function(){
-            $('#frame_main').attr('src','/user/union_mgr/');
+            $('#frame_main').attr('src','{%url "union_mgr"%}');
         });
         $('body').on('click','#category',function(){
-            $('#frame_main').attr('src','/user/category_write/');
+            $('#frame_main').attr('src','{%url "category_mgr"%}');
         });
         $('body').on('click','#usermgr',function(){
-            $('#frame_main').attr('src','/user/user_mgr/');
+            $('#frame_main').attr('src','{%url "user_mgr"%}');
         });
         $('body').on('click','#handwrt_mgr',function(){
-            $('#frame_main').attr('src','/user/handwrt_mgr/');
+            $('#frame_main').attr('src','{%url "handwrt_mgr"%}');
         });
     });
 </script>

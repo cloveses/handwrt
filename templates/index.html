@@ -7,7 +7,10 @@
         <h3 id="username">欢迎你：<span id="current_user">{{username}}</span><button id="logout" class="pure-button pure-button-primary">注销</button></h3>
         {%else%}
         <a class="pure-button pure-button-primary" id="login_btn" href="javascript:void(0);">登录</a><button class="pure-button pure-button-primary" id="signup">注册</button>
-        <h3 style="display: none;" id="username">欢迎你：<span id="current_user">{{username}}</span><button id="logout">注销</button></h3>
+        <h3 style="display: none;" id="username">欢迎你：
+            <span id="current_user">{{username}}</span>
+            <button class="pure-button pure-button-primary" id="logout">注销</button>
+        </h3>
         {%endif%}
     </div>
 {%endblock%}
@@ -36,11 +39,11 @@
                     <li class="pure-menu-item"><a csid="0" href="javascript:void(0);" class="pure-menu-link menu_link_cs">书法资料</a></li>
                     <li class="pure-menu-item"><a csid="1" href="javascript:void(0);" class="pure-menu-link menu_link_cs">名家书法</a></li>
                     {%if utype == '0'%}
-                    <li class="pure-menu-item"><a href="{%url 'mgr'%}" class="pure-menu-link">我的主页</a></li>
+                    <li class="pure-menu-item home_page"><a href="{%url 'mgr'%}" class="pure-menu-link">我的主页</a></li>
                     {%elif utype == '1'%}
-                    <li class="pure-menu-item"><a href="{%url 'union_owner_mgr'%}" class="pure-menu-link">我的主页</a></li>
+                    <li class="pure-menu-item home_page"><a href="{%url 'union_owner_mgr'%}" class="pure-menu-link">我的主页</a></li>
                     {%elif utype == '2'%}
-                    <li class="pure-menu-item"><a href="{%url 'mgr'%}" class="pure-menu-link">我的主页</a></li>
+                    <li class="pure-menu-item home_page"><a href="#" class="pure-menu-link">我的主页</a></li>
                     {%endif%}
                 </ul>
             </div>
@@ -194,7 +197,7 @@ $(function(){
         submitLi.on('click', '#login', function () {
             $.ajax({
                 type: 'POST',
-                url: '/user/login/',//提交的地址
+                url: '{%url "login"%}',//提交的地址
                 data: {name:nameInput.val(),password:passWordInput.val(),csrfmiddlewaretoken:token},
                 dataType: 'json',
                 timeout: 3000,
@@ -203,10 +206,12 @@ $(function(){
                     if (data['status'] == 1) {
                         stateLi.text('登录失败！');
                     }else{
-                    field.hide();
-                     $('#login_btn').hide();
-                    $('#username').show();
-                    $('#current_user').text(nameInput.val());
+                    // field.hide();
+                    //  $('#login_btn').hide();
+                    //  $('#signup').hide();
+                    // $('#username').show();
+                    // $('#current_user').text(nameInput.val());
+                    window.location.href="{%url 'helo'%}";
                     }
                 },
                 error: function (xhr, type) {

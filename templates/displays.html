@@ -10,7 +10,12 @@
       </tr>
       {% for hw in hws%}
           <tr>
-              <td><a href="{%url 'display'%}?id={{hw.id}}" target="_blank">{{hw.title}}</a></td>
+              <td>
+                <a href="{%url 'display'%}?id={{hw.id}}" target="_blank">{{hw.title}}</a>
+                {%if hw.score >= 10 %}
+                <img width="40px" src="{%static 'hot.png'%}" />
+                {%endif%}
+              </td>
               <td>{{hw.info}}</td>
               <td>{{hw.owner.name}}</td>
               <td>{{hw.create_date}}</td>
