@@ -22,6 +22,8 @@ urlpatterns = [
     path('get_handwrt_category_supers/', views.get_handwrt_category_supers, name='get_handwrt_category_supers'),
     path('display/', views.display, name='display'),
     path('search/', views.search, name='search'),
-
+    path('personal/', views.personal, name='personal'),
+    path('user_info/', views.user_info, name='user_info'),
+    path('get_handwrts_union/<int:unid>/', views.get_handwrts_union, name='get_handwrts_union'),
 
 ]

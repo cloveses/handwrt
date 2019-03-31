@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}我的主页{% endblock %}
+
+{% block top %}欢迎你！{% endblock %}
+
+{% block side %}
+    <style type="text/css">
+        .pure-menu-link {
+            color: red;
+        }
+    </style>
+    <div class="pure-menu custom-restricted-width">
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item"><a id="my_info" href="javascript:void(0);" class="pure-menu-link">我的信息</a></li>
+            <li class="pure-menu-item"><a id="my_handwrt" href="javascript:void(0);" class="pure-menu-link">我的作品</a></li>
+            <li class="pure-menu-item"><a href="#" class="pure-menu-link">修改信息</a></li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block main %}
+<iframe id="frame_main" src="{%url 'user_info'%}" style="width: 100%;min-height:700px;border:0;"></iframe>
+<script type="text/javascript">
+    $(function(){
+        $('body').on('click','#union_info',function(){
+            $('#frame_main').attr('src','{%url 'union_info'%}');
+        });
+        $('body').on('click','#handwrt_mgr',function(){
+            $('#frame_main').attr('src','{%url 'handwrt_mgr'%}');
+        });
+        $('body').on('click','#usermgr',function(){
+            $('#frame_main').attr('src','/user/user_mgr/');
+        });
+    });
+</script>
+{% endblock %}

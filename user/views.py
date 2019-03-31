@@ -34,7 +34,7 @@ def get_category_content_menus():
     for parent_content in parent_contents:
         children = CategoryContent.objects.filter(parent=parent_content).all()
         children_menus = [(child.id,child.name) for child in children]
-        print(children_menus)
+        # print(children_menus)
         menus[(parent_content.id, parent_content.name)] = children_menus
     return menus
 
@@ -336,10 +336,13 @@ def handwrt_mgr(request):
             'category_contents':category_contents, 'utype':utype})
 
 
-def get_handwrt_writes(request):
+def get_handwrt_writes(request, unid=0):
     cid = request.GET.get('id').strip()
     category_write = CategoryWrite.objects.get(id=int(cid))
-    hws = HandWrite.objects.filter(category_write=category_write).all()
+    hws = HandWrite.objects.filter(category_write=category_write)
+    if unid:
+        union = Union.objects.get(id=unid)
+        hws = hws.filter(in_union=union).all()
     return render(request, 'displays.html', {'hws':hws})
     
 def display(request):
@@ -350,11 +353,22 @@ def display(request):
     print(hw.file_path)
     return render(request, 'display.html', {'hw':hw})
 
-def get_handwrt_contents(request):
+def get_handwrt_contents(request, unid=0):
     cid = request.GET.get('id').strip()
     category_content = CategoryContent.objects.get(id=int(cid))
     hws = HandWrite.objects.filter(category_content=category_content).all()
+    if unid:
+        union = Union.objects.get(id=unid)
+        hws = hws.filter(in_union=union).all()
     return render(request, 'displays.html', {'hws':hws})
+
+def get_handwrts_union(request, unid=0):
+    if not unid:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+    union = Union.objects.get(id=unid)
+    hws = HandWrite.objects.filter(in_union=union).all()
+    return render(request, 'displays.html', {'hws':hws})
+
     
 def get_handwrt_category_supers(request):
     cid = request.GET.get('id').strip()
@@ -369,3 +383,26 @@ def search(request):
     else:
         hws = HandWrite.objects.all().order_by('-create_date')[:10]
     return render(request, 'displays.html', {'hws':hws})
+
+def personal(request):
+    if request.method == 'GET':
+        if login_error(request, [0,1,2]):
+            return HttpResponseRedirect(reverse('helo'))
+        return render(request, 'personal.html', {})
+
+def user_info(request):
+    uid = request.COOKIES.get('userid','').strip()
+    if uid and uid.isdigit():
+        user = User.objects.get(id=int(uid))
+        warnning_info = None
+        if user.status == 1:
+            warnning = UserInfo.objects.filter(user=user).order_by('-create_date').first()
+            if warnning:
+                warnning_info = warnning.content
+        my_union = None
+        if user.permission == 1:
+            my_union = Union.objects.filter(owner=user).first()
+        unions = user.members.all()
+        return render(request, 'user_info.html', 
+            {'user':user, 'warnning_info':warnning_info,
+            'my_union':my_union, 'unions':unions})

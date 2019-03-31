@@ -7,6 +7,7 @@
           <td>作品简介</td>
           <td>上传者</td>
           <td>上传时间</td>
+          <td></td>
       </tr>
       {% for hw in hws%}
           <tr>
@@ -19,6 +20,11 @@
               <td>{{hw.info}}</td>
               <td>{{hw.owner.name}}</td>
               <td>{{hw.create_date}}</td>
+              <td>
+              {%if hw.in_union%}
+              <a href="{%url 'get_handwrts_union' hw.in_union.id %}">{{hw.in_union.name}}</a>
+              {%endif%}
+              </td>
           </tr>
       {% endfor %}
   </table>

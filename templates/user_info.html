@@ -1,0 +1,42 @@
+{% extends 'inbase_smpl.html' %}
+{% load static %}
+{% block main %}
+  <table class="pure-table">
+      <tr>
+          <td><h2>{{user.name}}</h2></td>
+      </tr>
+      <tr>
+          <td><h2>{{user.email}}</h2></td>
+      </tr>
+      <tr>
+          <td>
+            {%if user.status == 0%}
+            正常
+            {%elif user.status == 1%}
+            警告:
+              {%if warnning_info%}
+                {{warnning_info.content}}
+              {%endif%}
+            {%endif%}
+        </td>
+      </tr>
+      {%if my_union%}
+      <tr>
+          <td>
+           <a target="_blank" href="{%url 'union_owner_mgr'%}">{{my_union.name}}盟主</a>
+        </td>
+      </tr>
+      {%endif%}
+      {%if unions%}
+      <tr>
+          <td>
+           <ul>
+            {%for union in unions%}
+            <li>{{union.name}}</li>
+            {%endfor%}
+           </ul>
+        </td>
+      </tr>
+      {%endif%}
+  </table>
+{% endblock %}

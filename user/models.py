@@ -9,6 +9,7 @@ class User(models.Model):
     email = models.EmailField(verbose_name='邮箱地址')
     permission = models.IntegerField(default=2, verbose_name='用户类型')
     status = models.IntegerField(default=0, verbose_name='用户状态')
+    # 0 正常 1 警告 2 锁定
 
 class UserInfo(models.Model):
     content = models.TextField()
@@ -26,7 +27,7 @@ class HandWrite(models.Model):
     create_date = models.DateTimeField(default=datetime.datetime.now)
     owner = models.ForeignKey('User', null=True, on_delete=models.CASCADE)
     category_super = models.IntegerField(null=True, default=0, verbose_name='管理员的分类')
-    # union = models.ForeignKey('Union', on_delete=models.CASCADE, null=True)
+    in_union = models.ForeignKey('Union', on_delete=models.CASCADE, null=True)
 
 class Union(models.Model):
     name = models.CharField(max_length=12, verbose_name='盟团名称')
