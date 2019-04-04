@@ -56,11 +56,6 @@
           <option value="{{category_content.id}}">{{category_content.name}}</option>
         {%endfor%}
       </select>
-      <label for="category_super">管理员分类</label>
-      <select id="category_super" name="category_super">
-        <option value="0">书法资料</option>
-        <option value='1'>名家书法</option>
-      </select>
       <input type="hidden" name="operation" value="2" />
       {%csrf_token%}
       <input type="submit" name="sub" value="添加" />
