@@ -23,11 +23,11 @@
 <iframe id="frame_main" src="{%url 'user_info'%}" style="width: 100%;min-height:700px;border:0;"></iframe>
 <script type="text/javascript">
     $(function(){
-        $('body').on('click','#union_info',function(){
-            $('#frame_main').attr('src','{%url 'union_info'%}');
+        $('body').on('click','#my_info',function(){
+            $('#frame_main').attr('src','{%url 'user_info'%}');
         });
-        $('body').on('click','#handwrt_mgr',function(){
-            $('#frame_main').attr('src','{%url 'handwrt_mgr'%}');
+        $('body').on('click','#my_handwrt',function(){
+            $('#frame_main').attr('src','{%url 'person_handwrt_mgr'%}');
         });
         $('body').on('click','#usermgr',function(){
             $('#frame_main').attr('src','/user/user_mgr/');

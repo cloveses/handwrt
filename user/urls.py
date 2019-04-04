@@ -25,5 +25,6 @@ urlpatterns = [
     path('personal/', views.personal, name='personal'),
     path('user_info/', views.user_info, name='user_info'),
     path('get_handwrts_union/<int:unid>/', views.get_handwrts_union, name='get_handwrts_union'),
+    path('person_handwrt_mgr/', views.person_handwrt_mgr, name='person_handwrt_mgr')
 
 ]

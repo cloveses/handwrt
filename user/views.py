@@ -12,6 +12,7 @@ from django.utils.timezone import utc
 SUPER_PERM = [0,]
 UNION_PERM = [1,]
 SUPER_UNION = [0, 1]
+ORDINARY_PERM = [2,]
 
 def make_passwd(psw, salt):
     psw = ''.join((psw, salt))
@@ -406,3 +407,50 @@ def user_info(request):
         return render(request, 'user_info.html', 
             {'user':user, 'warnning_info':warnning_info,
             'my_union':my_union, 'unions':unions})
+
+# 作品管理
+def person_handwrt_mgr(request):
+    if login_error(request, ORDINARY_PERM):
+        return HttpResponseRedirect(reverse('helo'))
+    u = request.COOKIES.get('userid','').strip()
+    u = User.objects.get(id=int(u))
+    hws = HandWrite.objects.filter(owner=u)
+    category_writes = CategoryWrite.objects.all()
+    category_contents = CategoryContent.objects.all()
+    utype = request.COOKIES.get('utype')
+    if request.method == 'GET':
+        return render(request, 'personal_handwrt.html', 
+            {'hws':hws, 'category_writes':category_writes,
+            'category_contents':category_contents, 'utype':utype})
+    else:
+        operation = request.POST.get('operation', '').strip()
+        if operation == '2':
+            category_write = request.POST.get('category_write')
+            category_content = request.POST.get('category_content')
+            title = request.POST.get('title','')
+            info = request.POST.get('info','')
+            if title and category_write and category_content:
+                category_write = CategoryWrite.objects.get(id=int(category_write))
+                category_content = CategoryContent.objects.get(id=int(category_content))
+                f = request.FILES["myfile"]
+                filename = f.name
+                ext = filename[filename.index('.'):] if '.' in filename else '.jpg'
+                filename = hashlib.md5(filename.encode()).hexdigest()
+                if os.path.exists(filename+ext):
+                    filename = filename+'1'+ext
+                else:
+                    filename = filename+ext
+                HandWrite(title=title, info=info, category_write=category_write,
+                    category_content=category_content,file_path=filename, owner=u).save()
+                with open(os.path.join('static','hws',filename), 'wb+') as dest:
+                    for chunk in f.chunks():
+                        dest.write(chunk)
+        else:
+            hid = request.POST.get('id','').strip()
+            if hid and hid.isdigit():
+                hw = HandWrite.objects.get(id=(int(hid)))
+                if operation == '1':
+                    hw.delete()
+        return render(request, 'personal_handwrt.html', 
+            {'hws':hws, 'category_writes':category_writes,
+            'category_contents':category_contents, 'utype':utype})
