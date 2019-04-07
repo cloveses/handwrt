@@ -173,14 +173,31 @@ def category_content_del(request, id=''):
         CategoryContent.objects.get(id=id).delete()
     return HttpResponseRedirect(reverse('category_mgr'))
 
+def get_page(page, page_range, total_pages=5):
+    page_count = len(page_range)
+    if page_count <= total_pages:
+        return list(page_range)
+    elif page_count - page <= 5:
+        return list(page_range[-5:])
+    else:
+        return page_range[page: page + 5]
+
 
 def user_mgr(request):
     if login_error(request, SUPER_PERM):
         return HttpResponseRedirect(reverse('helo'))
+    page = request.GET.get('page', '').strip()
+    if not page or not page.isdigit():
+        page = 1
+    else:
+        page = int(page)
     if request.method == 'GET':
         users = User.objects.all()
-        users = Paginator(users, 10).page(1)
-        return render(request, 'user_mgr.html', {'users':users})
+        users = Paginator(users,2)
+        print('ppp:',users.page_range)
+        print(users.num_pages)
+        page_nums = get_page(page, users.page_range)
+        return render(request, 'user_mgr.html', {'users':users.page(page),'page': page, 'page_nums':page_nums})
     elif request.method == 'POST':
         operation = request.POST.get('operation', '')
         uid = request.POST.get('id', '')
@@ -311,8 +328,9 @@ def handwrt_mgr(request):
                 else:
                     filename = filename+ext
                 if utype == '1':
+                    in_union = Union.objects.get(owner=u)
                     HandWrite(title=title, info=info, category_write=category_write,
-                        category_content=category_content,file_path=filename, owner=u).save()
+                        category_content=category_content,file_path=filename, owner=u, in_union=in_union).save()
                 else:
                     category_super = int(request.POST.get('category_super'))
                     HandWrite(title=title, info=info, category_write=category_write, flag=True,
@@ -364,11 +382,15 @@ def get_handwrt_contents(request, unid=0):
     return render(request, 'displays.html', {'hws':hws})
 
 def get_handwrts_union(request, unid=0):
+    u = request.COOKIES.get('userid','').strip()
     if not unid:
         return HttpResponseNotFound('<h1>Page not found</h1>')
     union = Union.objects.get(id=unid)
+    user = User.objects.get(id=u)
+    if user in union.users.all():
+        u = None
     hws = HandWrite.objects.filter(in_union=union).all()
-    return render(request, 'displays.html', {'hws':hws})
+    return render(request, 'union_displays.html', {'hws':hws, 'union':union, 'userid':u})
 
     
 def get_handwrt_category_supers(request):
@@ -407,6 +429,17 @@ def user_info(request):
         return render(request, 'user_info.html', 
             {'user':user, 'warnning_info':warnning_info,
             'my_union':my_union, 'unions':unions})
+
+def attend_union(request):
+    u = request.COOKIES.get('userid','').strip()
+    union_id = request.GET.get('union_id', '')
+    if u and union_id and u.isdigit() and union_id.isdigit():
+        u = User.objects.get(id=u)
+        union = Union.objects.get(id=union_id)
+        union.users.add(u)
+        union.save()
+        return JsonResponse({'status':0})
+    return JsonResponse({'status':1})
 
 # 作品管理
 def person_handwrt_mgr(request):
@@ -454,3 +487,8 @@ def person_handwrt_mgr(request):
         return render(request, 'personal_handwrt.html', 
             {'hws':hws, 'category_writes':category_writes,
             'category_contents':category_contents, 'utype':utype})
+
+def page_test(request, page=1):
+    print(page, type(page))
+    print(reverse('page_test', kwargs={'page':1}))
+    return render(request, 'page_test.html',{})

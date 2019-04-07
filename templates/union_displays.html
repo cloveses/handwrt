@@ -1,0 +1,57 @@
+{% extends 'inbase_smpl.html' %}
+{% load static %}
+{% block main %}
+  {%if userid%}
+  <a id="attendunion" href="javascript:void(0);" unionid="{{union.id}}"><h3>{{union.name}}</h3></a>
+  {%endif%}
+  <table class="pure-table pure-table-bordered">
+      <tr>
+          <td>作品主题</td>
+          <td>作品简介</td>
+          <td>上传者</td>
+          <td>上传时间</td>
+          <td>所属盟团</td>
+      </tr>
+      {% for hw in hws%}
+          <tr>
+              <td>
+                <a href="{%url 'display'%}?id={{hw.id}}" target="_blank">{{hw.title}}</a>
+                {%if hw.score >= 10 %}
+                <img width="40px" src="{%static 'hot.png'%}" />
+                {%endif%}
+              </td>
+              <td>{{hw.info}}</td>
+              <td>{{hw.owner.name}}</td>
+              <td>{{hw.create_date}}</td>
+              <td>
+              {%if hw.in_union%}
+              <a target="_blank" href="{%url 'get_handwrts_union' hw.in_union.id %}">{{hw.in_union.name}}</a>
+              {%endif%}
+              </td>
+          </tr>
+      {% endfor %}
+  </table>
+  <script type="text/javascript">
+    $(function(){
+            $('body').on('click', '#attendunion', function () {
+            $.ajax({
+                type: 'GET',
+                url: '{%url "attend_union"%}?union_id='+$('#attendunion').attr('unionid'),//提交的地址
+                dataType: 'json',
+                timeout: 3000,
+                context: $('body'),
+                success: function (data) {
+                    if (data['status'] == 1) {
+                        alert('访问失败！');
+                    }else{
+                      alert('成功加入！');
+                    }
+                },
+                error: function (xhr, type) {
+                    stateLi.text("访问失败");
+                }
+            })
+        });
+      })
+  </script>
+{% endblock %}

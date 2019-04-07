@@ -1,7 +1,7 @@
 {% extends 'inbase_smpl.html' %}
 {% load static %}
 {% block main %}
-  <table class="pure-table pure-table-bordered">
+  <table class="pure-table pure-table-bordered" style="margin: 0 auto;">
       <tr>
           <td>作品主题</td>
           <td>书体分类</td>
@@ -37,34 +37,51 @@
       {% endfor %}
   </table>
 
-  <form action="" method="post" enctype="multipart/form-data"  class="pure-form">
+  <form action="" method="post" enctype="multipart/form-data"  class="pure-form pure-form-aligned">
     <fieldset>
-      <label for="title">作品名称：</label>
-      <input id="title" type="text" name="title" />
-      <label for="myfile">上传文件</label>
-      <input id="myfile" type="file" name="myfile" />
-      <label for="info">作品简介</label>
-      <textarea id="info" name="info"></textarea>
-      <label for="category_write">书体类别</label>
-      <select id="category_write" name="category_write">
-        {%for category_write in category_writes%}
-          <option value="{{category_write.id}}">{{category_write.name}}</option>
-        {%endfor%}
-      </select>
-      <label for="category_content">内容分类</label>
-      <select id="category_content" name="category_content">
-        {%for category_content in category_contents%}
-          <option value="{{category_content.id}}">{{category_content.name}}</option>
-        {%endfor%}
-      </select>
-      <label for="category_super">管理员分类</label>
-      <select id="category_super" name="category_super">
-        <option value="0">书法资料</option>
-        <option value='1'>名家书法</option>
-      </select>
+      <div class="pure-control-group">
+        <label for="title">作品名称</label>
+        <input id="title" type="text" name="title" />
+      </div>
+      <div class="pure-control-group">
+        <label for="myfile">上传文件</label>
+        <input id="myfile" type="file" name="myfile" />
+      </div>
+      <div class="pure-control-group">
+        <label for="info">作品简介</label>
+        <textarea id="info" name="info" cols="120"></textarea>
+      </div>
+      <div class="pure-control-group">
+        <label for="category_write">书体类别</label>
+        <select id="category_write" name="category_write">
+          {%for category_write in category_writes%}
+            <option value="{{category_write.id}}">{{category_write.name}}</option>
+          {%endfor%}
+        </select>
+      </div>
+      <div class="pure-control-group">
+        <label for="category_content">内容分类</label>
+        <select id="category_content" name="category_content">
+          {%for category_content in category_contents%}
+            <option value="{{category_content.id}}">{{category_content.name}}</option>
+          {%endfor%}
+        </select>
+      </div>
+      {%if utype == '0'%}
+      <div class="pure-control-group">
+        <label for="category_super">管理员分类</label>
+        <select id="category_super" name="category_super">
+          <option value="0">书法资料</option>
+          <option value='1'>名家书法</option>
+        </select>
+      </div>
+      {%endif%}
       <input type="hidden" name="operation" value="2" />
       {%csrf_token%}
-      <input type="submit" name="sub" value="添加" />
+      <div class="pure-controls">
+
+        <button type="submit" class="pure-button pure-button-primary">添加</button>
+      </div>
     </fieldset>
   </form>
 {% endblock %}

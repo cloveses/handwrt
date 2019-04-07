@@ -1,13 +1,13 @@
 {% extends 'inbase_smpl.html' %}
 {% load static %}
 {% block main %}
-  <table class="pure-table pure-table-bordered">
+  <table class="pure-table pure-table-bordered" style="margin: 0 auto;">
       <tr>
           <td>作品主题</td>
           <td>作品简介</td>
           <td>上传者</td>
           <td>上传时间</td>
-          <td></td>
+          <td>所属盟团</td>
       </tr>
       {% for hw in hws%}
           <tr>
@@ -22,7 +22,7 @@
               <td>{{hw.create_date}}</td>
               <td>
               {%if hw.in_union%}
-              <a href="{%url 'get_handwrts_union' hw.in_union.id %}">{{hw.in_union.name}}</a>
+              <a target="_blank" href="{%url 'get_handwrts_union' hw.in_union.id %}">{{hw.in_union.name}}</a>
               {%endif%}
               </td>
           </tr>
