@@ -16,7 +16,7 @@
             <td>{{user.permission}}</td>
             <td>{{user.status}}</td>
             <td>
-                <form action="{% url 'user_mgr'%}" method="post">
+                <form action="{% url 'user_mgr' page%}" method="post">
                     {% csrf_token %}
                     <select name="operation">
                         <option style='display: none'></option>
@@ -32,5 +32,11 @@
         </tr>
     {% endfor %}
 </table>
-{%include 'page_content.html'%}
+{%for page_num in page_nums%}
+    {%if page_num == page%}
+        第{{page_num}}页
+    {%else%}
+        <a href="{%url 'user_mgr' page_num%}">第{{page_num}}页</a>
+    {%endif%}
+{%endfor%}
 {% endblock %}

@@ -71,10 +71,13 @@ def login(request):
 #     else:
 #         return HttpResponseNotFound('<h1>Page not found</h1>')
 
+
+#超级管理员管理页面
 def mgr(request):
     if login_error(request, SUPER_PERM):
         return HttpResponseRedirect(reverse('helo'))
     return render(request, 'mgr.html', {})
+
 
 def register(request):
     if request.method == 'GET':
@@ -183,19 +186,19 @@ def get_page(page, page_range, total_pages=5):
         return page_range[page: page + 5]
 
 
-def user_mgr(request):
+def user_mgr(request, page=1):
     if login_error(request, SUPER_PERM):
         return HttpResponseRedirect(reverse('helo'))
-    page = request.GET.get('page', '').strip()
-    if not page or not page.isdigit():
-        page = 1
-    else:
-        page = int(page)
+    # page = request.GET.get('page', '').strip()
+    # if not page or not page.isdigit():
+    #     page = 1
+    # else:
+    #     page = int(page)
     if request.method == 'GET':
         users = User.objects.all()
         users = Paginator(users,2)
-        print('ppp:',users.page_range)
-        print(users.num_pages)
+        # print('ppp:',users.page_range)
+        # print(users.num_pages)
         page_nums = get_page(page, users.page_range)
         return render(request, 'user_mgr.html', {'users':users.page(page),'page': page, 'page_nums':page_nums})
     elif request.method == 'POST':
@@ -216,7 +219,7 @@ def user_mgr(request):
                 if u:
                     u.status = 2
                     u.save()
-        return HttpResponseRedirect(reverse('user_mgr'))
+        return HttpResponseRedirect(reverse('user_mgr', kwargs={'page':page}))
 
 def union_reg(request):
     if login_error(request):
@@ -241,13 +244,14 @@ def union_reg(request):
         return render(request, 'union_reg.html', {'msg':msg})
 
 
-def union_mgr(request):
+def union_mgr(request, page=1):
     if login_error(request, SUPER_PERM):
         return HttpResponseRedirect(reverse('helo'))
     if request.method == 'GET':
         unions = Union.objects.all()
-        unions = Paginator(unions, 10).page(1)
-        return render(request, 'union_mgr.html', {'unions':unions})
+        unions = Paginator(unions, 2)
+        page_nums = get_page(page, unions.page_range)
+        return render(request, 'union_mgr.html', {'unions':unions.page(page),'page': page, 'page_nums':page_nums})
     elif request.method == 'POST':
         operation = request.POST.get('operation', '')
         uid = request.POST.get('id', '')
@@ -271,7 +275,7 @@ def union_mgr(request):
                 if u:
                     u.status = 3
                     u.save()
-        return HttpResponseRedirect(reverse('union_mgr'))
+        return HttpResponseRedirect(reverse('union_mgr', kwargs={'page':page}))
 
 
 def union_owner_mgr(request):

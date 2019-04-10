@@ -2,6 +2,6 @@
     {%if page_num == page%}
         第{{page_num}}页
     {%else%}
-        <a href="{%url 'user_mgr'%}?page={{page_num}}">第{{page_num}}页</a>
+        <a href="{%url 'user_mgr' page_num%}">第{{page_num}}页</a>
     {%endif%}
 {%endfor%}

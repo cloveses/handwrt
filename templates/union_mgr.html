@@ -16,7 +16,7 @@
             <td>{{union.owner.name}}</td>
             <td>{{union.status}}</td>
             <td>
-                <form action="{% url 'union_mgr'%}" method="post">
+                <form action="{% url 'union_mgr' page%}" method="post">
                     {% csrf_token %}
                     <select name="operation">
                         <option style='display: none'></option>
@@ -32,5 +32,12 @@
         </tr>
     {% endfor %}
 </table>
+{%for page_num in page_nums%}
+    {%if page_num == page%}
+        第{{page_num}}页
+    {%else%}
+        <a href="{%url 'union_mgr' page_num%}">第{{page_num}}页</a>
+    {%endif%}
+{%endfor%}
 
 {% endblock %}

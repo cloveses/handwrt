@@ -21,17 +21,17 @@
 {% endblock %}
 
 {% block main %}
-<iframe id="frame_main" src="{%url 'union_mgr'%}" style="width: 100%;min-height:700px;border:0;"></iframe>
+<iframe id="frame_main" src="{%url 'union_mgr' 1%}" style="width: 100%;min-height:700px;border:0;"></iframe>
 <script type="text/javascript">
     $(function(){
         $('body').on('click','#unionmgr',function(){
-            $('#frame_main').attr('src','{%url "union_mgr"%}');
+            $('#frame_main').attr('src','{%url "union_mgr" 1%}');
         });
         $('body').on('click','#category',function(){
             $('#frame_main').attr('src','{%url "category_mgr"%}');
         });
         $('body').on('click','#usermgr',function(){
-            $('#frame_main').attr('src','{%url "user_mgr"%}');
+            $('#frame_main').attr('src','{%url "user_mgr" 1%}');
         });
         $('body').on('click','#handwrt_mgr',function(){
             $('#frame_main').attr('src','{%url "handwrt_mgr"%}');
