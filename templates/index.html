@@ -79,16 +79,16 @@
 <script type="text/javascript">
     $(function(){
         $('body').on('click','.menu_link',function(){
-            $('#frame_main').attr('src',"{%url 'get_handwrt_writes'%}?id="+$(this).attr('cwid'));
+            $('#frame_main').attr('src',"{%url 'get_handwrt_writes' 1%}?id="+$(this).attr('cwid'));
         });
         $('body').on('click','.menu_link_cc',function(){
-            $('#frame_main').attr('src',"{%url 'get_handwrt_contents'%}?id="+$(this).attr('ccid'));
+            $('#frame_main').attr('src',"{%url 'get_handwrt_contents' 1%}?id="+$(this).attr('ccid'));
         });
          $('body').on('click','.menu_link_cs',function(){
-            $('#frame_main').attr('src',"{%url 'get_handwrt_category_supers'%}?id="+$(this).attr('csid'));
+            $('#frame_main').attr('src',"{%url 'get_handwrt_category_supers' 1%}?id="+$(this).attr('csid'));
         });
          $('body').on('click','#search',function(){
-            $('#frame_main').attr('src',"{%url 'search'%}?key="+$('#key').val());
+            $('#frame_main').attr('src',"{%url 'search' 1%}?key="+$('#key').val());
         });
         $('body').on('click','#logout',function(){
             $.fn.cookie('username', '000', { expires: -1, path:'/' });

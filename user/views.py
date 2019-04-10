@@ -300,17 +300,25 @@ def union_info(request):
 
 
 # 作品管理
-def handwrt_mgr(request):
+def handwrt_mgr(request, page=1):
     if login_error(request, SUPER_UNION):
         return HttpResponseRedirect(reverse('helo'))
-    hws = HandWrite.objects.all()
+    utype = request.COOKIES.get('utype')
+    if utype == '0':
+        hws = HandWrite.objects.all()
+    else:
+        u = request.COOKIES.get('userid','').strip()
+        u = User.objects.get(id=int(u))
+        union = Union.objects.get(owner=u)
+        hws = HandWrite.objects.filter(in_union=union)
+    hws = Paginator(hws, 2)
+    page_nums = get_page(page, hws.page_range)
     category_writes = CategoryWrite.objects.all()
     category_contents = CategoryContent.objects.all()
-    utype = request.COOKIES.get('utype')
     if request.method == 'GET':
         return render(request, 'upload_handwrt.html', 
-            {'hws':hws, 'category_writes':category_writes,
-            'category_contents':category_contents, 'utype':utype})
+            {'hws':hws.page(page), 'category_writes':category_writes,
+            'category_contents':category_contents, 'utype':utype,'page': page, 'page_nums':page_nums })
     else:
         operation = request.POST.get('operation', '').strip()
         if operation == '2':
@@ -359,14 +367,17 @@ def handwrt_mgr(request):
             'category_contents':category_contents, 'utype':utype})
 
 
-def get_handwrt_writes(request, unid=0):
+def get_handwrt_writes(request, unid=0, page=1):
     cid = request.GET.get('id').strip()
+    get_params = '?id={}'.format(cid)
     category_write = CategoryWrite.objects.get(id=int(cid))
     hws = HandWrite.objects.filter(category_write=category_write)
+    hws = Paginator(hws, 2)
+    page_nums = get_page(page, hws.page_range)
     if unid:
         union = Union.objects.get(id=unid)
         hws = hws.filter(in_union=union).all()
-    return render(request, 'displays.html', {'hws':hws})
+    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'get_handwrt_writes', 'get_params':get_params})
     
 def display(request):
     hid = request.GET.get('id', '').strip()
@@ -376,40 +387,54 @@ def display(request):
     print(hw.file_path)
     return render(request, 'display.html', {'hw':hw})
 
-def get_handwrt_contents(request, unid=0):
+def get_handwrt_contents(request, unid=0, page=1):
+    # if not unid:
+    #     return HttpResponseNotFound('<h1>Page not found</h1>')
     cid = request.GET.get('id').strip()
+    get_params = '?id={}'.format(cid)
     category_content = CategoryContent.objects.get(id=int(cid))
     hws = HandWrite.objects.filter(category_content=category_content).all()
     if unid:
         union = Union.objects.get(id=unid)
         hws = hws.filter(in_union=union).all()
-    return render(request, 'displays.html', {'hws':hws})
+    hws = Paginator(hws, 2)
+    page_nums = get_page(page, hws.page_range)
+    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'get_handwrt_contents', 'get_params':get_params})
 
-def get_handwrts_union(request, unid=0):
+def get_handwrts_union(request, unid=0, page=1):
     u = request.COOKIES.get('userid','').strip()
     if not unid:
         return HttpResponseNotFound('<h1>Page not found</h1>')
-    union = Union.objects.get(id=unid)
-    user = User.objects.get(id=u)
-    if user in union.users.all():
-        u = None
+    union = Union.objects.get(id=int(unid))
+    if u:
+        user = User.objects.get(id=u)
+        if user in union.users.all():
+            u = None
     hws = HandWrite.objects.filter(in_union=union).all()
-    return render(request, 'union_displays.html', {'hws':hws, 'union':union, 'userid':u})
+    hws = Paginator(hws, 2)
+    page_nums = get_page(page, hws.page_range)
+    return render(request, 'union_displays.html', {'hws':hws.page(page), 'unid':unid, 'union':union, 'userid':u, 'page': page, 'page_nums':page_nums })
 
     
-def get_handwrt_category_supers(request):
+def get_handwrt_category_supers(request,page=1):
     cid = request.GET.get('id').strip()
+    get_params = '?id={}'.format(cid)
     hws = HandWrite.objects.filter(category_super=int(cid)).all()
-    return render(request, 'displays.html', {'hws':hws})
+    hws = Paginator(hws, 2)
+    page_nums = get_page(page, hws.page_range)
+    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'get_handwrt_category_supers', 'get_params':get_params})
 
 
-def search(request):
+def search(requestt, page=1):
     key = request.GET.get('key','').strip()
+    get_params = '?key={}'.format(cid)
     if key:
         hws = HandWrite.objects.filter(title__contains=key).all()[:10]
     else:
         hws = HandWrite.objects.all().order_by('-create_date')[:10]
-    return render(request, 'displays.html', {'hws':hws})
+    hws = Paginator(hws, 2)
+    page_nums = get_page(page, hws.page_range)
+    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'search', 'get_params':get_params})
 
 def personal(request):
     if request.method == 'GET':
@@ -446,19 +471,21 @@ def attend_union(request):
     return JsonResponse({'status':1})
 
 # 作品管理
-def person_handwrt_mgr(request):
+def person_handwrt_mgr(request, page=1):
     if login_error(request, ORDINARY_PERM):
         return HttpResponseRedirect(reverse('helo'))
     u = request.COOKIES.get('userid','').strip()
     u = User.objects.get(id=int(u))
     hws = HandWrite.objects.filter(owner=u)
+    hws = Paginator(hws, 2)
+    page_nums = get_page(page, hws.page_range)
     category_writes = CategoryWrite.objects.all()
     category_contents = CategoryContent.objects.all()
     utype = request.COOKIES.get('utype')
     if request.method == 'GET':
         return render(request, 'personal_handwrt.html', 
-            {'hws':hws, 'category_writes':category_writes,
-            'category_contents':category_contents, 'utype':utype})
+            {'hws':hws.page(page), 'category_writes':category_writes,
+            'category_contents':category_contents, 'utype':utype, 'page': page, 'page_nums':page_nums})
     else:
         operation = request.POST.get('operation', '').strip()
         if operation == '2':

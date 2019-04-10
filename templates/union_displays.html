@@ -25,12 +25,22 @@
               <td>{{hw.create_date}}</td>
               <td>
               {%if hw.in_union%}
-              <a target="_blank" href="{%url 'get_handwrts_union' hw.in_union.id %}">{{hw.in_union.name}}</a>
+              <a target="_blank" href="{%url 'get_handwrts_union' hw.in_union.id page%}">{{hw.in_union.name}}</a>
               {%endif%}
               </td>
           </tr>
       {% endfor %}
   </table>
+<div style="width: 400px; margin: 0 auto; text-align: right;">
+{%for page_num in page_nums%}
+    {%if page_num == page%}
+        第{{page_num}}页
+    {%else%}
+        <a href="{%url 'get_handwrts_union' unid page_num%}">第{{page_num}}页</a>
+    {%endif%}
+{%endfor%}
+</div>
+
   <script type="text/javascript">
     $(function(){
             $('body').on('click', '#attendunion', function () {

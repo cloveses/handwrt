@@ -14,9 +14,9 @@
         <ul class="pure-menu-list">
             <li class="pure-menu-item"><a id="union_info" href="javascript:void(0);" class="pure-menu-link">盟团信息</a></li>
             <li class="pure-menu-item"><a id="handwrt_mgr" href="javascript:void(0);" class="pure-menu-link">作品管理</a></li>
-            <li class="pure-menu-item"><a href="#" class="pure-menu-link">反馈管理</a></li>
+<!--             <li class="pure-menu-item"><a href="#" class="pure-menu-link">反馈管理</a></li>
             <li class="pure-menu-item"><a href="#" class="pure-menu-link">封面管理</a></li>
-        </ul>
+ -->        </ul>
     </div>
 {% endblock %}
 
@@ -28,7 +28,7 @@
             $('#frame_main').attr('src','{%url 'union_info'%}');
         });
         $('body').on('click','#handwrt_mgr',function(){
-            $('#frame_main').attr('src','{%url 'handwrt_mgr'%}');
+            $('#frame_main').attr('src','{%url 'handwrt_mgr' 1%}');
         });
         $('body').on('click','#usermgr',function(){
             $('#frame_main').attr('src','/user/user_mgr/');

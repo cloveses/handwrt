@@ -36,6 +36,15 @@
           </tr>
       {% endfor %}
   </table>
+<div style="width: 400px; margin: 0 auto; text-align: right;">
+{%for page_num in page_nums%}
+    {%if page_num == page%}
+        第{{page_num}}页
+    {%else%}
+        <a href="{%url 'handwrt_mgr' page_num%}">第{{page_num}}页</a>
+    {%endif%}
+{%endfor%}
+</div>
 
   <form action="" method="post" enctype="multipart/form-data"  class="pure-form pure-form-aligned">
     <fieldset>
