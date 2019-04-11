@@ -365,8 +365,8 @@ def handwrt_mgr(request, page=1):
                     hw.flag = False
                     hw.save()
         return render(request, 'upload_handwrt.html', 
-            {'hws':hws, 'category_writes':category_writes,
-            'category_contents':category_contents, 'utype':utype})
+            {'hws':hws.page(page), 'category_writes':category_writes,
+            'category_contents':category_contents, 'utype':utype,'page': page, 'page_nums':page_nums})
 
 
 def get_handwrt_writes(request, unid=0, page=1):

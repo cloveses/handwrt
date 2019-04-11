@@ -9,7 +9,7 @@
         {% for data in datas %}
         <tr>
             <td>{{data.name}}</td>
-            <td><a href="/user/category_write/del/{{data.id}}/">删除</a> </td>
+            <td><a href="{%url 'category_write' data.id%}">删除</a> </td>
         </tr>
         {% endfor %}
    </table>
@@ -32,7 +32,7 @@
         <tr>
             <td>{{data.name}}</td>
             <td>{% if data.parent %} {{data.parent.name}} {%endif%}</td>
-            <td><a href="/user/category_content/del/{{data.id}}/">删除</a> </td>
+            <td><a href="{%url 'category_content' data.id%}">删除</a> </td>
         </tr>
         {% endfor %}
     </table>
