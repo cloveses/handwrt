@@ -1,12 +1,15 @@
 {% extends 'inbase_smpl.html' %}
 {% load static %}
 {% block main %}
+    {% if info %}
+    <p>{{info}}</p>
+    {% endif %}
   <table class="pure-table">
       <tr>
-          <td><h2>{{user.name}}</h2></td>
+          <td><h2>用户名：{{user.name}}</h2></td>
       </tr>
       <tr>
-          <td><h2>{{user.email}}</h2></td>
+          <td><h2>邮件地址：{{user.email}}</h2></td>
       </tr>
       <tr>
           <td>

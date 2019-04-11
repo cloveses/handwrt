@@ -14,7 +14,7 @@
         <ul class="pure-menu-list">
             <li class="pure-menu-item"><a id="my_info" href="javascript:void(0);" class="pure-menu-link">我的信息</a></li>
             <li class="pure-menu-item"><a id="my_handwrt" href="javascript:void(0);" class="pure-menu-link">我的作品</a></li>
-            <!-- <li class="pure-menu-item"><a href="#" class="pure-menu-link">修改信息</a></li> -->
+            <li class="pure-menu-item"><a id="edit_user" href="javascript:void(0);" class="pure-menu-link">修改信息</a></li>
         </ul>
     </div>
 {% endblock %}
@@ -29,8 +29,8 @@
         $('body').on('click','#my_handwrt',function(){
             $('#frame_main').attr('src','{%url 'person_handwrt_mgr' 1%}');
         });
-        $('body').on('click','#usermgr',function(){
-            $('#frame_main').attr('src','/user/user_mgr/');
+        $('body').on('click','#edit_user',function(){
+            $('#frame_main').attr('src','{%url 'edit_user'%}');
         });
     });
 </script>

@@ -79,6 +79,19 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
+    # 'default': {
+    # # 'ENGINE': 'mysql.connector.django',
+    # 'NAME': 'handwrt',
+    # 'ENGINE': 'django.db.backends.mysql',
+    # 'USER': 'root',
+    # 'PASSWORD': '123456',
+    # 'HOST': 'localhost',
+    # 'PORT': '3306',
+    # 'OPTIONS': {
+    #       'autocommit': True,
+    #     },
+    # # 'PASSWORD': 'EiUu2n<xXtgE',
+    # }
 }
 
 

@@ -13,6 +13,8 @@ SUPER_PERM = [0,]
 UNION_PERM = [1,]
 SUPER_UNION = [0, 1]
 ORDINARY_PERM = [2,]
+ALL_PERM = [0,1,2]
+PAGE_ITEMS = 2
 
 def make_passwd(psw, salt):
     psw = ''.join((psw, salt))
@@ -117,9 +119,9 @@ def category_mgr(request):
     if login_error(request, SUPER_PERM):
         return HttpResponseRedirect(reverse('helo'))
     category_writes = CategoryWrite.objects.all()
-    category_writes = Paginator(category_writes, 10).page(1)
+    # category_writes = Paginator(category_writes, PAGE_ITEMS).page(1)
     category_contents = CategoryContent.objects.all()
-    category_contents = Paginator(category_contents, 10).page(1)
+    # category_contents = Paginator(category_contents, PAGE_ITEMS).page(1)
     parent_contents = CategoryContent.objects.filter(parent__isnull=True)
     return render(request, 'category_mgr.html',
                   {'datas': category_writes, 'data_cs':category_contents,
@@ -196,7 +198,7 @@ def user_mgr(request, page=1):
     #     page = int(page)
     if request.method == 'GET':
         users = User.objects.all()
-        users = Paginator(users,2)
+        users = Paginator(users, PAGE_ITEMS)
         # print('ppp:',users.page_range)
         # print(users.num_pages)
         page_nums = get_page(page, users.page_range)
@@ -249,7 +251,7 @@ def union_mgr(request, page=1):
         return HttpResponseRedirect(reverse('helo'))
     if request.method == 'GET':
         unions = Union.objects.all()
-        unions = Paginator(unions, 2)
+        unions = Paginator(unions, PAGE_ITEMS)
         page_nums = get_page(page, unions.page_range)
         return render(request, 'union_mgr.html', {'unions':unions.page(page),'page': page, 'page_nums':page_nums})
     elif request.method == 'POST':
@@ -311,7 +313,7 @@ def handwrt_mgr(request, page=1):
         u = User.objects.get(id=int(u))
         union = Union.objects.get(owner=u)
         hws = HandWrite.objects.filter(in_union=union)
-    hws = Paginator(hws, 2)
+    hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
     category_writes = CategoryWrite.objects.all()
     category_contents = CategoryContent.objects.all()
@@ -372,7 +374,7 @@ def get_handwrt_writes(request, unid=0, page=1):
     get_params = '?id={}'.format(cid)
     category_write = CategoryWrite.objects.get(id=int(cid))
     hws = HandWrite.objects.filter(category_write=category_write)
-    hws = Paginator(hws, 2)
+    hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
     if unid:
         union = Union.objects.get(id=unid)
@@ -397,7 +399,7 @@ def get_handwrt_contents(request, unid=0, page=1):
     if unid:
         union = Union.objects.get(id=unid)
         hws = hws.filter(in_union=union).all()
-    hws = Paginator(hws, 2)
+    hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
     return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'get_handwrt_contents', 'get_params':get_params})
 
@@ -411,7 +413,7 @@ def get_handwrts_union(request, unid=0, page=1):
         if user in union.users.all():
             u = None
     hws = HandWrite.objects.filter(in_union=union).all()
-    hws = Paginator(hws, 2)
+    hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
     return render(request, 'union_displays.html', {'hws':hws.page(page), 'unid':unid, 'union':union, 'userid':u, 'page': page, 'page_nums':page_nums })
 
@@ -420,7 +422,7 @@ def get_handwrt_category_supers(request,page=1):
     cid = request.GET.get('id').strip()
     get_params = '?id={}'.format(cid)
     hws = HandWrite.objects.filter(category_super=int(cid)).all()
-    hws = Paginator(hws, 2)
+    hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
     return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'get_handwrt_category_supers', 'get_params':get_params})
 
@@ -432,7 +434,7 @@ def search(requestt, page=1):
         hws = HandWrite.objects.filter(title__contains=key).all()[:10]
     else:
         hws = HandWrite.objects.all().order_by('-create_date')[:10]
-    hws = Paginator(hws, 2)
+    hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
     return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'search', 'get_params':get_params})
 
@@ -444,6 +446,7 @@ def personal(request):
 
 def user_info(request):
     uid = request.COOKIES.get('userid','').strip()
+    info = request.GET.get('info', '')
     if uid and uid.isdigit():
         user = User.objects.get(id=int(uid))
         warnning_info = None
@@ -457,7 +460,7 @@ def user_info(request):
         unions = user.members.all()
         return render(request, 'user_info.html', 
             {'user':user, 'warnning_info':warnning_info,
-            'my_union':my_union, 'unions':unions})
+            'my_union':my_union, 'unions':unions, 'info':info})
 
 def attend_union(request):
     u = request.COOKIES.get('userid','').strip()
@@ -477,7 +480,7 @@ def person_handwrt_mgr(request, page=1):
     u = request.COOKIES.get('userid','').strip()
     u = User.objects.get(id=int(u))
     hws = HandWrite.objects.filter(owner=u)
-    hws = Paginator(hws, 2)
+    hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
     category_writes = CategoryWrite.objects.all()
     category_contents = CategoryContent.objects.all()
@@ -523,3 +526,31 @@ def page_test(request, page=1):
     print(page, type(page))
     print(reverse('page_test', kwargs={'page':1}))
     return render(request, 'page_test.html',{})
+
+def edit_user(request):
+    if login_error(request, ALL_PERM):
+        return HttpResponseRedirect(reverse('helo'))
+    info = request.GET.get('info', '')
+    uid = request.COOKIES.get('userid','').strip()
+    u = User.objects.get(id=int(uid))
+    if request.method == 'GET':
+        return render(request, 'edit_user.html', {'user':u, 'info': info})
+    else:
+        keys = ('opassword', 'password1', 'password2', 'email')
+        params = {}
+        for key in keys:
+            params[key] = request.POST.get(key, '').strip()
+        params = {k:v for k,v in params.items() if v}
+        print(params)
+        if len(params) == 4 or (len(params) == 3 and 'email' not in params):
+            opassword = make_passwd(params['opassword'], u.name)
+            if u.passwd == opassword and params['password1'] == params['password2']:
+                u.passwd = make_passwd(params['password1'], u.name)
+                u.email = email
+                u.save()
+                return HttpResponseRedirect(reverse(user_info) + '?info=个人信息修改成功！')
+            else:
+                return render(request, 'edit_user.html', {'user':u, 'info': '旧密码错误或新密码不匹配！'})
+        else:
+            return render(request, 'edit_user.html', {'user':u, 'info': '输入参数不完整！'})
+

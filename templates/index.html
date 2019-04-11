@@ -75,7 +75,7 @@
 {% endblock %}
 
 {% block main %}
-<iframe id="frame_main" src="" style="width: 100%;min-height:700px;border:0;"></iframe>
+<iframe id="frame_main" src="{%url 'get_handwrt_category_supers' 1%}?id=0" style="width: 100%;min-height:700px;border:0;"></iframe>
 <script type="text/javascript">
     $(function(){
         $('body').on('click','.menu_link',function(){
@@ -98,6 +98,7 @@
         });
          $('body').on('click','#signup',function(){
             window.location.href="{%url 'register'%}";
+            // $('#frame_main').attr('src',"{%url 'register' %}");
         });
    });
 </script>

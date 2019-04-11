@@ -28,5 +28,6 @@ urlpatterns = [
     path('person_handwrt_mgr/<int:page>/', views.person_handwrt_mgr, name='person_handwrt_mgr'),
     path('attend_union/', views.attend_union, name='attend_union'),
     path('page_test/<int:page>/', views.page_test, name='page_test'),
+    path('edit_user/', views.edit_user, name='edit_user'),
 
 ]
