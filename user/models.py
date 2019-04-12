@@ -19,6 +19,7 @@ class UserInfo(models.Model):
 class HandWrite(models.Model):
     title = models.CharField(max_length=256, verbose_name='标题')
     info = models.TextField(verbose_name='作品简介')
+    description = models.TextField(null=True, verbose_name='作品描述')
     category_write = models.ForeignKey('CategoryWrite', on_delete=models.CASCADE, verbose_name='书体分类')
     category_content = models.ForeignKey('CategoryContent', on_delete=models.CASCADE, verbose_name='内容分类')
     flag = models.BooleanField(default=False, verbose_name='审核情况')
@@ -28,6 +29,12 @@ class HandWrite(models.Model):
     owner = models.ForeignKey('User', null=True, on_delete=models.CASCADE)
     category_super = models.IntegerField(null=True, default=0, verbose_name='管理员的分类')
     in_union = models.ForeignKey('Union', on_delete=models.CASCADE, null=True)
+
+class Comment(models.Model):
+    content = models.TextField(null=True, verbose_name='评论内容')
+    create_date = models.DateTimeField(default=datetime.datetime.now)
+    handwrite = models.ForeignKey('HandWrite', on_delete=models.CASCADE)
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
 
 class Union(models.Model):
     name = models.CharField(max_length=12, verbose_name='盟团名称')

@@ -1,7 +1,7 @@
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.views.decorators.http import require_http_methods
-from .models import CategoryWrite, CategoryContent, User, UserInfo, Union, UnionInfo, HandWrite
+from .models import CategoryWrite, CategoryContent, User, UserInfo, Union, UnionInfo, HandWrite, Comment
 from django.core.paginator import Paginator
 from django.urls import reverse
 from django.forms import ModelForm
@@ -189,18 +189,18 @@ def get_page(page, page_range, total_pages=5):
 
 
 def user_mgr(request, page=1):
-    if login_error(request, SUPER_PERM):
+    if login_error(request, SUPER_UNION):
+        print('login err')
         return HttpResponseRedirect(reverse('helo'))
-    # page = request.GET.get('page', '').strip()
-    # if not page or not page.isdigit():
-    #     page = 1
-    # else:
-    #     page = int(page)
     if request.method == 'GET':
-        users = User.objects.all()
+        u = request.COOKIES.get('userid','').strip()
+        u = User.objects.get(id=int(u))
+        if u.permission == 0:
+            users = User.objects.all()
+        else:
+            union = Union.objects.get(owner=u)
+            users = union.users.all()
         users = Paginator(users, PAGE_ITEMS)
-        # print('ppp:',users.page_range)
-        # print(users.num_pages)
         page_nums = get_page(page, users.page_range)
         return render(request, 'user_mgr.html', {'users':users.page(page),'page': page, 'page_nums':page_nums})
     elif request.method == 'POST':
@@ -226,8 +226,11 @@ def user_mgr(request, page=1):
 def union_reg(request):
     if login_error(request):
         return HttpResponseRedirect(reverse('helo'))
+    u = request.COOKIES.get('userid','').strip()
+    u = User.objects.get(id=int(u))
+    union = Union.objects.filter(owner=u).first()
     if request.method == 'GET':
-        return render(request, 'union_reg.html', {'msg':''})
+        return render(request, 'union_reg.html', {'msg':'', 'union':union})
     else:
         uid = request.COOKIES.get('userid', '')
         msg = '申请成功，请耐心等待管理员审核！'
@@ -243,7 +246,7 @@ def union_reg(request):
                 msg = '盟团名称已被注册！'
         else:
             msg = '信息输入不全！'
-        return render(request, 'union_reg.html', {'msg':msg})
+        return render(request, 'union_reg.html', {'msg':msg, 'union':union})
 
 
 def union_mgr(request, page=1):
@@ -328,8 +331,9 @@ def handwrt_mgr(request, page=1):
             u = User.objects.get(id=int(u))
             category_write = request.POST.get('category_write')
             category_content = request.POST.get('category_content')
-            title = request.POST.get('title','')
-            info = request.POST.get('info','')
+            title = request.POST.get('title','').strip()
+            info = request.POST.get('info','').strip()
+            description = request.POST.get('description','').strip()
             if title and category_write and category_content:
                 category_write = CategoryWrite.objects.get(id=int(category_write))
                 category_content = CategoryContent.objects.get(id=int(category_content))
@@ -343,11 +347,11 @@ def handwrt_mgr(request, page=1):
                     filename = filename+ext
                 if utype == '1':
                     in_union = Union.objects.get(owner=u)
-                    HandWrite(title=title, info=info, category_write=category_write,
+                    HandWrite(title=title, info=info, description=description, category_write=category_write,
                         category_content=category_content,file_path=filename, owner=u, in_union=in_union).save()
                 else:
                     category_super = int(request.POST.get('category_super'))
-                    HandWrite(title=title, info=info, category_write=category_write, flag=True,
+                    HandWrite(title=title, info=info, description=description, category_write=category_write, flag=True,
                         category_content=category_content,file_path=filename, owner=u, 
                         category_super=category_super).save()
 
@@ -383,11 +387,15 @@ def get_handwrt_writes(request, unid=0, page=1):
     
 def display(request):
     hid = request.GET.get('id', '').strip()
-    hw = HandWrite.objects.get(id=hid)
+    hw = HandWrite.objects.get(id=int(hid))
+    info = request.COOKIES.get('info', '')
     hw.score += 1
     hw.save()
-    print(hw.file_path)
-    return render(request, 'display.html', {'hw':hw})
+    comments = Comment.objects.filter(handwrite=hw)[:30]
+    resp = render(request, 'display.html', {'hw':hw, 'info':info, 'comments':comments})
+    if info:
+        resp.set_cookie('info', '')
+    return resp
 
 def get_handwrt_contents(request, unid=0, page=1):
     # if not unid:
@@ -410,7 +418,7 @@ def get_handwrts_union(request, unid=0, page=1):
     union = Union.objects.get(id=int(unid))
     if u:
         user = User.objects.get(id=u)
-        if user in union.users.all():
+        if user in union.users.all() or union.owner == u:
             u = None
     hws = HandWrite.objects.filter(in_union=union).all()
     hws = Paginator(hws, PAGE_ITEMS)
@@ -439,9 +447,9 @@ def search(requestt, page=1):
     return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'search', 'get_params':get_params})
 
 def personal(request):
+    if login_error(request, [0,1,2]):
+        return HttpResponseRedirect(reverse('helo'))
     if request.method == 'GET':
-        if login_error(request, [0,1,2]):
-            return HttpResponseRedirect(reverse('helo'))
         return render(request, 'personal.html', {})
 
 def user_info(request):
@@ -554,3 +562,32 @@ def edit_user(request):
         else:
             return render(request, 'edit_user.html', {'user':u, 'info': '输入参数不完整！'})
 
+# 点赞
+def like(request):
+    if request.method == 'POST':
+        hid = request.POST.get('id', '')
+        if hid and hid.isdigit():
+            hw = HandWrite.objects.get(id=int(hid))
+            hw.score += 1
+            hw.save()
+            return JsonResponse({'status':0})
+    return JsonResponse({'status':1})
+
+#评论
+def comment(request):
+    hid = request.POST.get('hwid', '').strip()
+    if login_error(request, ALL_PERM):
+        if hid:
+            resp = HttpResponseRedirect(reverse('display')+'?id='+hid)
+            resp.set_cookie('info', '请登录后评论！')
+            return resp
+        else:
+            return HttpResponseRedirect(reverse('helo'))
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()
+        if hid and hid.isdigit():
+            uid = request.COOKIES.get('userid','').strip()
+            u = User.objects.get(id=int(uid))
+            hw = HandWrite.objects.get(id=int(hid))
+            Comment(content=content, handwrite=hw, user=u).save()
+        return HttpResponseRedirect(reverse('display')+'?id='+hid)

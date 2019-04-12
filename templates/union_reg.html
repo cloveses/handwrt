@@ -4,6 +4,9 @@
     {% if msg %}
     <p>{{msg}}</p>
     {% endif %}
+    {%if union%}
+    <h3>你已经建立盟团：{{union.name}}</h3>
+    {%else%}
     <form action="{% url 'union_reg'%}" method="post"  class="pure-form pure-form-stacked">
         {% csrf_token %}
         <fieldset>
@@ -14,4 +17,6 @@
             <input type="submit" value="确定" class="pure-button pure-button-primary" />
         </fieldset>
     </form>
+    {% endif %}
+
 {% endblock %}

@@ -1,6 +1,10 @@
 {% extends 'inbase_smpl.html' %}
 {% load static %}
 {% block main %}
+  {% csrf_token %}
+  {%if info%}
+  <input type="hidden" id="info" value="{{info}}" />
+  {%endif%}
   <table class="pure-table" style="margin: 0 auto;">
       <tr>
           <td><h2>{{hw.title}}</h2></td>
@@ -9,10 +13,74 @@
           <td><h2>{{hw.create_date}}</h2></td>
       </tr>
       <tr>
+          <td>
+            <h2><a id="like" href="javascript:void(0);" dataid='{{hw.id}}'><img style="width: 1.2em;" src="{%static 'like.png'%}"></a>当前赞数：<span id="score">{{hw.score}}</span></h2>
+          </td>
+      </tr>
+      <tr>
           <td><img src="{%static hw.file_path%}" /></td>
       </tr>
       <tr>
           <td><h2>{{hw.info}}</h2></td>
       </tr>
+      {%if hw.description%}
+      <tr>
+          <td><h2>{{hw.description}}</h2></td>
+      </tr>
+      {%endif%}
   </table>
+  <div  style="width: 200px;margin: 0 auto;">
+    <form action="{% url 'comment'%}" method="post"  class="pure-form pure-form-stacked" >
+        {% csrf_token %}
+        <fieldset>
+            <label for="content">我的点评：</label>
+            <textarea id="content" name="content"  placeholder="评论内容"></textarea>
+            <input type="hidden" name="hwid" value="{{hw.id}}">
+            <input type="submit" value="提交" class="pure-button pure-button-primary" />
+        </fieldset>
+    </form>
+    </div>
+  <div  style="width: 380px;margin: 0 auto;">
+    {%for comment in comments %}
+      <ul>
+        <li>{{comment.content}}</li>
+        <li style="list-style: none;">评论者:{{comment.user.name}}&nbsp;&nbsp;时间:{{comment.create_date}}</li>
+      </ul>
+    {%endfor%}
+  </div>
+<script type="text/javascript">
+  $(function() {
+      var info = $('#info').val();
+      if (info) {
+        alert(info);
+      };
+      $('body').on('click','#like',function(){
+            var token = $("input[name='csrfmiddlewaretoken']").val();
+            $.ajax({
+                type: 'POST',
+                url: '{%url "like" %}',//提交的地址
+                data: {id:$('#like').attr('dataid'),csrfmiddlewaretoken:token},
+                dataType: 'json',
+                timeout: 3000,
+                context: $('body'),
+                success: function (data) {
+                    if (data['status'] == 1) {
+                        alert('上传失败！');
+                    }else{
+                    // field.hide();
+                    //  $('#login_btn').hide();
+                    //  $('#signup').hide();
+                    // $('#username').show();
+                    // $('#current_user').text(nameInput.val());
+                    var score = Number($('#score').text());
+                    $('#score').text(score+1);
+                    }
+                },
+                error: function (xhr, type) {
+                    alert("上传失败");
+                }
+            })        });
+
+  });
+</script>
 {% endblock %}
