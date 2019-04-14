@@ -24,6 +24,7 @@ urlpatterns = [
     path('search/<int:page>/', views.search, name='search'),
     path('personal/', views.personal, name='personal'),
     path('user_info/', views.user_info, name='user_info'),
+    path('union_edit/', views.union_edit, name='union_edit'),
     path('get_handwrts_union/<int:unid>/<int:page>/', views.get_handwrts_union, name='get_handwrts_union'),
     path('person_handwrt_mgr/<int:page>/', views.person_handwrt_mgr, name='person_handwrt_mgr'),
     path('attend_union/', views.attend_union, name='attend_union'),

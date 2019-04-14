@@ -3,14 +3,19 @@
 {% block main %}
   <table class="pure-table pure-table-bordered" style="margin: 0 auto;">
       <tr>
+          <td>作品概览</td>
           <td>作品主题</td>
           <td>作品简介</td>
           <td>上传者</td>
-          <td>上传时间</td>
           <td>所属盟团</td>
       </tr>
       {% for hw in hws%}
           <tr>
+              <td>
+                {%if hw.file_path%}
+                <img style="width: 4em;" src="{%static hw.file_path%}" />
+                {%endif%}
+              </td>
               <td>
                 <a href="{%url 'display'%}?id={{hw.id}}" target="_blank">{{hw.title}}</a>
                 {%if hw.score >= 10 %}
@@ -19,7 +24,6 @@
               </td>
               <td>{{hw.info}}</td>
               <td>{{hw.owner.name}}</td>
-              <td>{{hw.create_date}}</td>
               <td>
               {%if hw.in_union%}
               <a target="" href="{%url 'get_handwrts_union' hw.in_union.id 1%}">{{hw.in_union.name}}</a>

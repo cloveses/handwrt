@@ -1,9 +1,13 @@
 {% extends 'inbase_smpl.html' %}
+{% load static %}
 
 {% block main %}
     {% if not union %}
     <p>你尚未拥有盟团哦！</p>
     {% else %}
+    {%if union.file_path%}
+        <img src="{%static union.file_path%}"/>
+    {%endif%}
     <h3>{{union.name}}</h3>
         {% if union.status == 0 %}
             <h4>未审核</h4>

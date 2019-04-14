@@ -15,9 +15,8 @@
             <li class="pure-menu-item"><a id="union_info" href="javascript:void(0);" class="pure-menu-link">盟团信息</a></li>
             <li class="pure-menu-item"><a id="handwrt_mgr" href="javascript:void(0);" class="pure-menu-link">作品管理</a></li>
             <li class="pure-menu-item"><a id="usermgr" href="javascript:void(0);" class="pure-menu-link">管理用户</a></li>
-<!--             <li class="pure-menu-item"><a href="#" class="pure-menu-link">反馈管理</a></li>
-            <li class="pure-menu-item"><a href="#" class="pure-menu-link">封面管理</a></li>
- -->        </ul>
+            <li class="pure-menu-item"><a id="union_edit" href="javascript:void(0);" class="pure-menu-link">编辑盟团</a></li>
+        </ul>
     </div>
 {% endblock %}
 
@@ -33,6 +32,9 @@
         });
         $('body').on('click','#usermgr',function(){
             $('#frame_main').attr('src','{%url "user_mgr" 1%}');
+        });
+        $('body').on('click','#union_edit',function(){
+            $('#frame_main').attr('src','{%url "union_edit" %}');
         });
     });
 </script>

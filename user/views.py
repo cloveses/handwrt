@@ -262,6 +262,43 @@ def union_reg(request):
             msg = '信息输入不全！'
         return render(request, 'union_reg.html', {'msg':msg, 'union':union})
 
+def union_edit(request):
+    if login_error(request):
+        return HttpResponseRedirect(reverse('helo'))
+    u = request.COOKIES.get('userid','').strip()
+    u = User.objects.get(id=int(u))
+    union = Union.objects.filter(owner=u).first()
+    if request.method == 'GET':
+        if union:
+            return render(request, 'union_edit.html', {})
+        else:
+            return HttpResponseNotFound('Page is Lost.')
+    else:
+        content = request.POST.get('content', '').strip()
+        if request.FILES["myfile"]:
+            f = request.FILES["myfile"]
+            filename = f.name
+            ext = filename[filename.index('.'):] if '.' in filename else '.jpg'
+            filename = hashlib.md5(filename.encode()).hexdigest()
+            if os.path.exists(filename+ext):
+                filename = filename+'1'+ext
+            else:
+                filename = filename+ext
+
+            with open(os.path.join('static','hws',filename), 'wb+') as dest:
+                for chunk in f.chunks():
+                    dest.write(chunk)
+        else:
+            filename = None
+        if content:
+            union.content = content
+        if filename:
+            if union.file_path and os.path.exists(os.path.join('static','hws',union.file_path)):
+                os.remove(os.path.join('static','hws',union.file_path))
+            union.file_path = filename
+        union.save()
+        return HttpResponseRedirect(reverse('union_info'))
+
 
 def union_mgr(request, page=1):
     if login_error(request, SUPER_PERM):
@@ -324,12 +361,12 @@ def handwrt_mgr(request, page=1):
         return HttpResponseRedirect(reverse('helo'))
     utype = request.COOKIES.get('utype')
     if utype == '0':
-        hws = HandWrite.objects.all()
+        hws = HandWrite.objects.order_by('-score').all()
     else:
         u = request.COOKIES.get('userid','').strip()
         u = User.objects.get(id=int(u))
         union = Union.objects.get(owner=u)
-        hws = HandWrite.objects.filter(in_union=union)
+        hws = HandWrite.objects.filter(in_union=union).order_by('-score')
     hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
     category_writes = CategoryWrite.objects.all()
@@ -380,8 +417,9 @@ def handwrt_mgr(request, page=1):
                     hw.flag = True
                     hw.save()
                 elif operation == '1':
-                    hw.flag = False
-                    hw.save()
+                    # hw.flag = False
+                    # hw.save()
+                    hw.delete()
         return render(request, 'upload_handwrt.html', 
             {'hws':hws.page(page), 'category_writes':category_writes,
             'category_contents':category_contents, 'utype':utype,'page': page, 'page_nums':page_nums})
@@ -449,9 +487,9 @@ def get_handwrt_category_supers(request,page=1):
     return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'get_handwrt_category_supers', 'get_params':get_params})
 
 
-def search(requestt, page=1):
+def search(request, page=1):
     key = request.GET.get('key','').strip()
-    get_params = '?key={}'.format(cid)
+    get_params = '?key={}'.format(key)
     if key:
         hws = HandWrite.objects.filter(title__contains=key).all()[:10]
     else:

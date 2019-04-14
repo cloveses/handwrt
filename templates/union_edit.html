@@ -1,0 +1,19 @@
+{% extends 'inbase_smpl.html' %}
+{% load static %}
+
+{% block main %}
+    <form action="" method="post" enctype="multipart/form-data"  class="pure-form pure-form-stacked">
+        {% csrf_token %}
+        <fieldset>
+            <label for="content">盟团简介</label>
+            <textarea id="content" name="content"></textarea>
+              <div class="pure-control-group">
+                <label for="myfile">封面图片</label>
+                <input id="myfile" type="file" name="myfile" />
+              </div>
+            <input type="submit" value="确定" class="pure-button pure-button-primary" />
+            <input type="reset" value="取消" class="pure-button pure-button-primary" />
+        </fieldset>
+    </form>
+
+{% endblock %}
