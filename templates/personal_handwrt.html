@@ -1,7 +1,8 @@
 {% extends 'inbase_smpl.html' %}
 {% load static %}
 {% block main %}
-  <table class="pure-table pure-table-bordered">
+ {%if is_member %}
+ <table class="pure-table pure-table-bordered">
       <tr>
           <td>作品主题</td>
           <td>书体分类</td>
@@ -83,4 +84,41 @@
        </div>
     </fieldset>
   </form>
+{%else%}
+<h3>你还没有加入任何盟团，暂时不能上传作品。</h3>
+<ol>
+  {%for union in unions%}
+  <li>
+    <a id="attendunion" href="javascript:void(0);" unionid="{{union.id}}">加入{{union.name}}</a>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <a href="{%url 'get_handwrts_union' union.id 1%}">浏览一下</a>
+  </li>
+  {%endfor%}
+</ol>
+{%endif%}
+
+  <script type="text/javascript">
+    $(function(){
+            $('body').on('click', '#attendunion', function () {
+            $.ajax({
+                type: 'GET',
+                url: '{%url "attend_union"%}?union_id='+$('#attendunion').attr('unionid'),//提交的地址
+                dataType: 'json',
+                timeout: 3000,
+                context: $('body'),
+                success: function (data) {
+                    if (data['status'] == 1) {
+                        alert('访问失败！');
+                    }else{
+                      alert('成功加入,请刷新页面！');
+                    }
+                },
+                error: function (xhr, type) {
+                    stateLi.text("访问失败");
+                }
+            })
+        });
+      })
+  </script>
+
 {% endblock %}

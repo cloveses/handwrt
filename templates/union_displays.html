@@ -32,7 +32,7 @@
       {% endfor %}
   </table>
 <div style="width: 400px; margin: 0 auto; text-align: right;">
-        <a href="{%url 'get_handwrts_union' 1%}">首页</a>
+        <a href="{%url 'get_handwrts_union' unid 1%}">首页</a>
 {%for page_num in page_nums%}
     {%if page_num == page%}
         第{{page_num}}页

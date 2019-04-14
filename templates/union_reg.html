@@ -1,4 +1,5 @@
 {% extends 'inbase_smpl.html' %}
+{% load static %}
 
 {% block main %}
     {% if msg %}
@@ -6,17 +7,26 @@
     {% endif %}
     {%if union%}
     <h3>你已经建立盟团：{{union.name}}</h3>
+    <p>{{union.content}}</p>
+    <img src="{%static union.file_path%}" />
     {%else%}
-    <form action="{% url 'union_reg'%}" method="post"  class="pure-form pure-form-stacked">
+    {%if msg != '申请成功，请耐心等待管理员审核！'%}
+    <form action="{% url 'union_reg'%}" method="post" enctype="multipart/form-data"  class="pure-form pure-form-stacked">
         {% csrf_token %}
         <fieldset>
             <label for="name">盟团名称</label>
             <input id="name" type="text" name="name" value="" placeholder="盟团名称" />
             <label for="content">盟团简介</label>
             <textarea id="content" name="content"></textarea>
+              <div class="pure-control-group">
+                <label for="myfile">封面图片</label>
+                <input id="myfile" type="file" name="myfile" />
+              </div>
             <input type="submit" value="确定" class="pure-button pure-button-primary" />
+            <input type="reset" value="取消" class="pure-button pure-button-primary" />
         </fieldset>
     </form>
+    {% endif %}
     {% endif %}
 
 {% endblock %}

@@ -236,11 +236,25 @@ def union_reg(request):
         msg = '申请成功，请耐心等待管理员审核！'
         name = request.POST.get('name', '').strip()
         content = request.POST.get('content', '').strip()
+
+        f = request.FILES["myfile"]
+        filename = f.name
+        ext = filename[filename.index('.'):] if '.' in filename else '.jpg'
+        filename = hashlib.md5(filename.encode()).hexdigest()
+        if os.path.exists(filename+ext):
+            filename = filename+'1'+ext
+        else:
+            filename = filename+ext
+
+        with open(os.path.join('static','hws',filename), 'wb+') as dest:
+            for chunk in f.chunks():
+                dest.write(chunk)
+
         if uid and uid.isdigit() and name and content:
             un = Union.objects.filter(name=name)
             if not un:
                 user = User.objects.get(id=int(uid))
-                un = Union(name=name, content=content, owner=user)
+                un = Union(name=name, content=content, owner=user, file_path=filename)
                 un.save()
             else:
                 msg = '盟团名称已被注册！'
@@ -487,6 +501,11 @@ def person_handwrt_mgr(request, page=1):
         return HttpResponseRedirect(reverse('helo'))
     u = request.COOKIES.get('userid','').strip()
     u = User.objects.get(id=int(u))
+    is_member = True if u.members.all() else False
+    if is_member:
+        unions = []
+    else:
+        unions = Union.objects.all()[:10]
     hws = HandWrite.objects.filter(owner=u)
     hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
@@ -496,7 +515,8 @@ def person_handwrt_mgr(request, page=1):
     if request.method == 'GET':
         return render(request, 'personal_handwrt.html', 
             {'hws':hws.page(page), 'category_writes':category_writes,
-            'category_contents':category_contents, 'utype':utype, 'page': page, 'page_nums':page_nums})
+            'category_contents':category_contents, 'utype':utype,
+            'page': page, 'page_nums':page_nums, 'is_member':is_member, 'unions':unions})
     else:
         operation = request.POST.get('operation', '').strip()
         if operation == '2':
@@ -528,7 +548,7 @@ def person_handwrt_mgr(request, page=1):
                     hw.delete()
         return render(request, 'personal_handwrt.html', 
             {'hws':hws, 'category_writes':category_writes,
-            'category_contents':category_contents, 'utype':utype})
+            'category_contents':category_contents, 'utype':utype, 'is_member':is_member, 'unions':unions})
 
 def page_test(request, page=1):
     print(page, type(page))

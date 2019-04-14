@@ -44,6 +44,7 @@ class Union(models.Model):
     active = models.IntegerField(default=0, verbose_name='活跃度')
     create_date = models.DateTimeField(default=datetime.datetime.now)
     content = models.TextField()
+    file_path = models.CharField(max_length=256)
     users = models.ManyToManyField(User, related_name='members')
 
 class UnionInfo(models.Model):
