@@ -32,6 +32,7 @@
         </tr>
     {% endfor %}
 </table>
+<div style="width: 500px; margin: 0 auto; text-align: right;">
 {%if 1 not in page_nums%}
     <a href="{%url 'union_mgr' 1%}">首页</a>
 {%endif%}
@@ -45,4 +46,5 @@
 {%if num_pages not in page_nums%}
 <a href="{%url 'union_mgr' num_pages%}">末页</a>
 {%endif%}
+</div>
 {% endblock %}
