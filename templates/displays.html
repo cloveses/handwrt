@@ -33,7 +33,9 @@
       {% endfor %}
   </table>
 <div style="width: 400px; margin: 0 auto; text-align: right;">
+{%if 1 not in page_nums%}
 <a href="{%url page_name 1%}{{get_params}}">首页</a>
+{%endif%}
 {%for page_num in page_nums%}
     {%if page_num == page%}
         第{{page_num}}页
@@ -41,6 +43,10 @@
         <a href="{%url page_name page_num%}{{get_params}}">第{{page_num}}页</a>
     {%endif%}
 {%endfor%}
+{%if num_pages not in page_nums%}
+<a href="{%url page_name num_pages%}{{get_params}}">末页</a>
+{%endif%}
+
 </div>
 
 {% endblock %}

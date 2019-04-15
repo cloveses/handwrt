@@ -202,7 +202,7 @@ def user_mgr(request, page=1):
             users = union.users.all()
         users = Paginator(users, PAGE_ITEMS)
         page_nums = get_page(page, users.page_range)
-        return render(request, 'user_mgr.html', {'users':users.page(page),'page': page, 'page_nums':page_nums})
+        return render(request, 'user_mgr.html', {'users':users.page(page),'page': page, 'page_nums':page_nums, 'num_pages': users.num_pages})
     elif request.method == 'POST':
         operation = request.POST.get('operation', '')
         uid = request.POST.get('id', '')
@@ -307,7 +307,7 @@ def union_mgr(request, page=1):
         unions = Union.objects.all()
         unions = Paginator(unions, PAGE_ITEMS)
         page_nums = get_page(page, unions.page_range)
-        return render(request, 'union_mgr.html', {'unions':unions.page(page),'page': page, 'page_nums':page_nums})
+        return render(request, 'union_mgr.html', {'unions':unions.page(page),'page': page, 'page_nums':page_nums, 'num_pages': unions.num_pages})
     elif request.method == 'POST':
         operation = request.POST.get('operation', '')
         uid = request.POST.get('id', '')
@@ -374,7 +374,7 @@ def handwrt_mgr(request, page=1):
     if request.method == 'GET':
         return render(request, 'upload_handwrt.html', 
             {'hws':hws.page(page), 'category_writes':category_writes,
-            'category_contents':category_contents, 'utype':utype,'page': page, 'page_nums':page_nums })
+            'category_contents':category_contents, 'utype':utype,'page': page, 'page_nums':page_nums, 'num_pages':hws.num_pages})
     else:
         operation = request.POST.get('operation', '').strip()
         if operation == '2':
@@ -435,7 +435,8 @@ def get_handwrt_writes(request, unid=0, page=1):
     if unid:
         union = Union.objects.get(id=unid)
         hws = hws.filter(in_union=union).all()
-    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'get_handwrt_writes', 'get_params':get_params})
+    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums,
+        'page_name':'get_handwrt_writes', 'get_params':get_params, 'num_pages': hws.num_pages})
     
 def display(request):
     hid = request.GET.get('id', '').strip()
@@ -461,7 +462,8 @@ def get_handwrt_contents(request, unid=0, page=1):
         hws = hws.filter(in_union=union).all()
     hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
-    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'get_handwrt_contents', 'get_params':get_params})
+    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums,
+        'page_name':'get_handwrt_contents', 'get_params':get_params, 'num_pages':hws.num_pages})
 
 def get_handwrts_union(request, unid=0, page=1):
     u = request.COOKIES.get('userid','').strip()
@@ -475,7 +477,8 @@ def get_handwrts_union(request, unid=0, page=1):
     hws = HandWrite.objects.filter(in_union=union).all()
     hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
-    return render(request, 'union_displays.html', {'hws':hws.page(page), 'unid':unid, 'union':union, 'userid':u, 'page': page, 'page_nums':page_nums })
+    return render(request, 'union_displays.html', {'hws':hws.page(page), 'unid':unid, 'union':union, 'userid':u,
+        'page': page, 'page_nums':page_nums, 'num_pages': hws.num_pages})
 
     
 def get_handwrt_category_supers(request,page=1):
@@ -484,7 +487,8 @@ def get_handwrt_category_supers(request,page=1):
     hws = HandWrite.objects.filter(category_super=int(cid)).all()
     hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
-    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'get_handwrt_category_supers', 'get_params':get_params})
+    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums,
+        'page_name':'get_handwrt_category_supers', 'get_params':get_params, 'num_pages': hws.num_pages})
 
 
 def search(request, page=1):
@@ -496,7 +500,8 @@ def search(request, page=1):
         hws = HandWrite.objects.all().order_by('-create_date')[:10]
     hws = Paginator(hws, PAGE_ITEMS)
     page_nums = get_page(page, hws.page_range)
-    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums, 'page_name':'search', 'get_params':get_params})
+    return render(request, 'displays.html', {'hws':hws.page(page), 'page': page, 'page_nums':page_nums,
+        'page_name':'search', 'get_params':get_params, 'num_pages': hws.num_pages})
 
 def personal(request):
     if login_error(request, [0,1,2]):
@@ -554,7 +559,7 @@ def person_handwrt_mgr(request, page=1):
         return render(request, 'personal_handwrt.html', 
             {'hws':hws.page(page), 'category_writes':category_writes,
             'category_contents':category_contents, 'utype':utype,
-            'page': page, 'page_nums':page_nums, 'is_member':is_member, 'unions':unions})
+            'page': page, 'page_nums':page_nums, 'is_member':is_member, 'unions':unions, 'num_pages':hws.num_pages})
     else:
         operation = request.POST.get('operation', '').strip()
         if operation == '2':

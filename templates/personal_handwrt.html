@@ -37,7 +37,9 @@
       {% endfor %}
   </table>
 <div style="width: 400px; margin: 0 auto; text-align: right;">
-        <a href="{%url 'person_handwrt_mgr' 1%}">首页</a>
+{%if 1 not in page_nums%}
+  <a href="{%url 'person_handwrt_mgr' 1%}">首页</a>
+{%endif%}
 {%for page_num in page_nums%}
     {%if page_num == page%}
         第{{page_num}}页
@@ -45,6 +47,9 @@
         <a href="{%url 'person_handwrt_mgr' page_num%}">第{{page_num}}页</a>
     {%endif%}
 {%endfor%}
+{%if num_pages not in page_nums%}
+<a href="{%url 'person_handwrt_mgr' num_pages%}">末页</a>
+{%endif%}
 </div>
 
   <form action="" method="post" enctype="multipart/form-data"  class="pure-form">

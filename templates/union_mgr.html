@@ -32,7 +32,9 @@
         </tr>
     {% endfor %}
 </table>
-        <a href="{%url 'union_mgr' 1%}">首页</a>
+{%if 1 not in page_nums%}
+    <a href="{%url 'union_mgr' 1%}">首页</a>
+{%endif%}
 {%for page_num in page_nums%}
     {%if page_num == page%}
         第{{page_num}}页
@@ -40,5 +42,7 @@
         <a href="{%url 'union_mgr' page_num%}">第{{page_num}}页</a>
     {%endif%}
 {%endfor%}
-
+{%if num_pages not in page_nums%}
+<a href="{%url 'union_mgr' num_pages%}">末页</a>
+{%endif%}
 {% endblock %}
