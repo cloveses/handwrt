@@ -422,7 +422,7 @@ def handwrt_mgr(request, page=1):
                     hw.delete()
         return render(request, 'upload_handwrt.html', 
             {'hws':hws.page(page), 'category_writes':category_writes,
-            'category_contents':category_contents, 'utype':utype,'page': page, 'page_nums':page_nums})
+            'category_contents':category_contents, 'utype':utype,'page': page, 'page_nums':page_nums, 'num_pages':hws.num_pages})
 
 
 def get_handwrt_writes(request, unid=0, page=1):
