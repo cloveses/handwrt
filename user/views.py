@@ -208,7 +208,13 @@ def user_mgr(request, page=1):
         uid = request.POST.get('id', '')
         if operation and uid and operation.isdigit() and uid.isdigit():
             if operation == '0':
-                User.objects.get(id=int(uid)).delete()
+                # edit
+                # User.objects.get(id=int(uid)).delete()
+                u = User.objects.get(id=int(uid))
+                un = u.members.all().first()
+                un.users.remove(u)
+                un.save()
+
             elif operation == '1':
                 u = User.objects.get(id=int(uid))
                 if u:
@@ -339,8 +345,11 @@ def union_owner_mgr(request):
         return HttpResponseRedirect(reverse('helo'))
     return render(request, 'union_owner_mgr.html', {})
 
-
-def union_info(request):
+# edit
+def union_info(request, union_id=None):
+    if union_id:
+        union = Union.objects.get(id=union_id)
+        return render(request, 'union_info.html', {'union':union,'warning':None})
     uid = request.COOKIES.get('userid', '')
     if not uid or not uid.isdigit():
         return render(request, 'union_info.html', {'union':None,'warning':None})
@@ -420,6 +429,7 @@ def handwrt_mgr(request, page=1):
                     # hw.flag = False
                     # hw.save()
                     hw.delete()
+        # edit
         return render(request, 'upload_handwrt.html', 
             {'hws':hws.page(page), 'category_writes':category_writes,
             'category_contents':category_contents, 'utype':utype,'page': page, 'page_nums':page_nums, 'num_pages':hws.num_pages})
@@ -578,8 +588,9 @@ def person_handwrt_mgr(request, page=1):
                     filename = filename+'1'+ext
                 else:
                     filename = filename+ext
+                # edit
                 HandWrite(title=title, info=info, category_write=category_write,
-                    category_content=category_content,file_path=filename, owner=u).save()
+                    category_content=category_content,file_path=filename, owner=u, in_union=u.members.all().first()).save()
                 with open(os.path.join('static','hws',filename), 'wb+') as dest:
                     for chunk in f.chunks():
                         dest.write(chunk)
@@ -590,7 +601,7 @@ def person_handwrt_mgr(request, page=1):
                 if operation == '1':
                     hw.delete()
         return render(request, 'personal_handwrt.html', 
-            {'hws':hws, 'category_writes':category_writes,
+            {'hws':hws.page(page), 'category_writes':category_writes,
             'category_contents':category_contents, 'utype':utype, 'is_member':is_member, 'unions':unions})
 
 def page_test(request, page=1):

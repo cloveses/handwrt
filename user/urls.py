@@ -16,6 +16,9 @@ urlpatterns = [
     path('union_mgr/<int:page>/', views.union_mgr, name='union_mgr'),
     path('union_owner_mgr/', views.union_owner_mgr, name='union_owner_mgr'),
     path('union_info/', views.union_info, name='union_info'),
+    # insert 
+    path('union_info/<int:union_id>/', views.union_info, name='union_info_id'),
+
     path('handwrt_mgr/<int:page>/', views.handwrt_mgr, name='handwrt_mgr'),
     path('get_handwrt_writes/<int:page>/', views.get_handwrt_writes, name='get_handwrt_writes'),
     path('get_handwrt_contents/<int:page>/', views.get_handwrt_contents, name='get_handwrt_contents'),

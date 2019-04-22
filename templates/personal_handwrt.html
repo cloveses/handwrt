@@ -96,7 +96,7 @@
   <li>
     <a id="attendunion" href="javascript:void(0);" unionid="{{union.id}}">加入{{union.name}}</a>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <a href="{%url 'get_handwrts_union' union.id 1%}">浏览一下</a>
+    <a href="{%url 'union_info_id' union.id%}">浏览一下</a>
   </li>
   {%endfor%}
 </ol>
