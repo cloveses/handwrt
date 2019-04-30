@@ -94,7 +94,7 @@
 <ol>
   {%for union in unions%}
   <li>
-    <a id="attendunion" href="javascript:void(0);" unionid="{{union.id}}">加入{{union.name}}</a>
+    <a class="attendunion" href="javascript:void(0);" unionid="{{union.id}}">加入{{union.name}}</a>
     &nbsp;&nbsp;&nbsp;&nbsp;
     <a href="{%url 'union_info_id' union.id%}">浏览一下</a>
   </li>
@@ -104,10 +104,10 @@
 
   <script type="text/javascript">
     $(function(){
-            $('body').on('click', '#attendunion', function () {
+            $('body').on('click', '.attendunion', function () {
             $.ajax({
                 type: 'GET',
-                url: '{%url "attend_union"%}?union_id='+$('#attendunion').attr('unionid'),//提交的地址
+                url: '{%url "attend_union"%}?union_id='+$(this).attr('unionid'),//提交的地址
                 dataType: 'json',
                 timeout: 3000,
                 context: $('body'),
